@@ -41,14 +41,38 @@ body {
     box-shadow: 0 2px 20px rgba(62,31,13,0.08);
     padding: 12px 0;
 }
+
+/* ---- LOGO ---- */
 .hairroots-brand {
     font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
+    font-size: 2.1rem !important;
     font-weight: 900;
     color: var(--dark-brown) !important;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
 }
-.hairroots-brand span { color: var(--terracotta); }
+.hairroots-brand:hover {
+    color: var(--dark-brown) !important;
+    text-decoration: none !important;
+}
+.hairroots-brand span {
+    color: var(--terracotta);
+    position: relative;
+}
+.hairroots-brand span::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+}
 
 .hairroots-link {
     color: var(--dark-brown) !important;
@@ -437,5 +461,5 @@ body {
     .page-title { font-size: 1.8rem; }
     .type-filter-btn { padding: 6px 14px; font-size: 0.82rem; }
     .newsletter-box { padding: 25px; }
-    .hairroots-brand { font-size: 1.4rem; }
+    .hairroots-brand { font-size: 1.6rem !important; }
 }
