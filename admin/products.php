@@ -1,4 +1,5 @@
 <?php
+require_once 'auth_admin.php'; 
 require_once '../config/database.php';
 $page_title = 'Gestion Produits - HairRoots Admin';
 
@@ -67,7 +68,7 @@ $filtre_cat   = isset($_GET['cat'])    ? (int)$_GET['cat']       : 0;
 $filtre_stock = isset($_GET['stock'])  ? $_GET['stock']           : '';
 $search       = isset($_GET['search']) ? trim($_GET['search'])    : '';
 
-$where = ["active = 1"]; $params = [];
+$where = ["p.active = 1"]; $params = [];
 if($filtre_cat)   { $where[] = "p.category_id = ?"; $params[] = $filtre_cat; }
 if($filtre_stock === 'rupture') { $where[] = "p.stock = 0"; }
 elseif($filtre_stock === 'faible') { $where[] = "p.stock > 0 AND p.stock <= 5"; }
@@ -81,7 +82,7 @@ $products = $stmt->fetchAll();
 // Categories
 $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
 
-include '../includes/header.php';
+include 'header_admin.php';
 ?>
 <style>
 .admin-page{background:#FDF8F2;min-height:80vh;padding:30px 0}
@@ -126,25 +127,25 @@ include '../includes/header.php';
 
 <div class="dash-header">
     <div>
-        <h1>📦 Gestion des Produits</h1>
+        <h1> Gestion des Produits</h1>
         <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($products) ?> produit(s) affiches</p>
     </div>
     <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn">📊 Dashboard</a>
-        <a href="products.php" class="dash-nav-btn active">📦 Produits</a>
-        <a href="orders.php" class="dash-nav-btn">🛍️ Commandes</a>
-        <a href="users.php" class="dash-nav-btn">👥 Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn">📅 RDV</a>
+        <a href="index.php" class="dash-nav-btn"> Dashboard</a>
+        <a href="products.php" class="dash-nav-btn active"> Produits</a>
+        <a href="orders.php" class="dash-nav-btn"> Commandes</a>
+        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
+        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
     </div>
 </div>
 
-<?php if($success): ?><div class="alert-hr success">✅ <?= htmlspecialchars($success) ?></div><?php endif; ?>
-<?php if($error):   ?><div class="alert-hr error">❌ <?= htmlspecialchars($error) ?></div><?php endif; ?>
+<?php if($success): ?><div class="alert-hr success"> <?= htmlspecialchars($success) ?></div><?php endif; ?>
+<?php if($error):   ?><div class="alert-hr error"> <?= htmlspecialchars($error) ?></div><?php endif; ?>
 
 <!-- FORMULAIRE AJOUT / MODIFICATION -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5><?= $edit_product ? '✏️ Modifier le produit' : '➕ Ajouter un produit' ?></h5>
+        <h5><?= $edit_product ? ' Modifier le produit' : ' Ajouter un produit' ?></h5>
         <?php if($edit_product): ?>
             <a href="products.php" class="pbtn pbtn-sm">+ Nouveau produit</a>
         <?php endif; ?>
@@ -191,16 +192,16 @@ include '../includes/header.php';
                 <div class="col-md-4 d-flex align-items-center gap-4">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="featured" id="featured" <?= ($edit_product['featured']??0)?'checked':'' ?> style="border-color:#C9A84C;accent-color:#C9A84C">
-                        <label class="form-check-label" for="featured" style="color:#3E1F0D;font-weight:600;font-size:0.85rem">⭐ Produit vedette</label>
+                        <label class="form-check-label" for="featured" style="color:#3E1F0D;font-weight:600;font-size:0.85rem"> Produit vedette</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="active" id="active" <?= ($edit_product['active']??1)?'checked':'' ?> style="border-color:#C9A84C;accent-color:#C9A84C">
-                        <label class="form-check-label" for="active" style="color:#3E1F0D;font-weight:600;font-size:0.85rem">✅ Actif</label>
+                        <label class="form-check-label" for="active" style="color:#3E1F0D;font-weight:600;font-size:0.85rem">Actif</label>
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
                     <button type="submit" class="pbtn">
-                        <?= $edit_product ? '💾 Mettre a jour' : '➕ Ajouter le produit' ?>
+                        <?= $edit_product ? ' Mettre a jour' : ' Ajouter le produit' ?>
                     </button>
                 </div>
             </div>
@@ -220,8 +221,8 @@ include '../includes/header.php';
         </select>
         <select class="pinput" name="stock" style="max-width:160px">
             <option value="">Tous les stocks</option>
-            <option value="rupture" <?= $filtre_stock==='rupture'?'selected':'' ?>>❌ Rupture</option>
-            <option value="faible" <?= $filtre_stock==='faible'?'selected':'' ?>>⚠️ Stock faible</option>
+            <option value="rupture" <?= $filtre_stock==='rupture'?'selected':'' ?>> Rupture</option>
+            <option value="faible" <?= $filtre_stock==='faible'?'selected':'' ?>> Stock faible</option>
         </select>
         <button type="submit" class="pbtn pbtn-sm">Filtrer</button>
         <a href="products.php" class="pbtn-info" style="padding:8px 14px">Reset</a>
@@ -231,7 +232,7 @@ include '../includes/header.php';
 <!-- LISTE PRODUITS -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5>📋 Liste des produits (<?= count($products) ?>)</h5>
+        <h5> Liste des produits (<?= count($products) ?>)</h5>
     </div>
     <div style="overflow-x:auto">
         <?php if(count($products) > 0): ?>
@@ -252,7 +253,7 @@ include '../includes/header.php';
                     <?php if(!empty($p['image'])): ?>
                         <img src="<?= htmlspecialchars($p['image']) ?>" alt="" class="prod-img">
                     <?php else: ?>
-                        <div class="prod-img-ph">🌿</div>
+                        <div class="prod-img-ph"></div>
                     <?php endif; ?>
                 </td>
                 <td>
@@ -265,23 +266,23 @@ include '../includes/header.php';
                 <td style="font-weight:800;color:#C1622F"><?= number_format($p['price'],2) ?>€</td>
                 <td>
                     <?php if($p['stock'] > 10): ?>
-                        <span class="stock-ok">✅ <?= $p['stock'] ?></span>
+                        <span class="stock-ok"> <?= $p['stock'] ?></span>
                     <?php elseif($p['stock'] > 0): ?>
-                        <span class="stock-low">⚠️ <?= $p['stock'] ?></span>
+                        <span class="stock-low"> <?= $p['stock'] ?></span>
                     <?php else: ?>
-                        <span class="stock-out">❌ 0</span>
+                        <span class="stock-out"> 0</span>
                     <?php endif; ?>
                 </td>
                 <td>
                     <a href="?toggle_featured=<?= $p['id'] ?>" style="font-size:1.2rem;text-decoration:none" title="<?= $p['featured']?'Retirer vedette':'Mettre en vedette' ?>">
-                        <?= $p['featured'] ? '⭐' : '☆' ?>
+                        <?= $p['featured'] ? '' : '☆' ?>
                     </a>
                 </td>
                 <td>
                     <div style="display:flex;gap:5px;flex-wrap:wrap">
-                        <a href="?edit=<?= $p['id'] ?>" class="pbtn-info">✏️ Modifier</a>
-                        <a href="/ecommerce/products/detail.php?id=<?= $p['id'] ?>" class="pbtn-success" target="_blank">👁️ Voir</a>
-                        <a href="?delete=<?= $p['id'] ?>" class="pbtn-danger" onclick="return confirm('Desactiver ce produit ?')">🗑️ Suppr.</a>
+                        <a href="?edit=<?= $p['id'] ?>" class="pbtn-info"> Modifier</a>
+                        <a href="/ecommerce/products/detail.php?id=<?= $p['id'] ?>" class="pbtn-success" target="_blank"> Voir</a>
+                        <a href="?delete=<?= $p['id'] ?>" class="pbtn-danger" onclick="return confirm('Desactiver ce produit ?')"> Suppr.</a>
                     </div>
                 </td>
             </tr>
@@ -290,7 +291,7 @@ include '../includes/header.php';
         </table>
         <?php else: ?>
         <div style="text-align:center;padding:40px;color:#9a7c5c">
-            <div style="font-size:3rem;margin-bottom:15px">📦</div>
+            <div style="font-size:3rem;margin-bottom:15px"></div>
             <h5 style="color:#3E1F0D">Aucun produit trouve</h5>
             <p>Ajoutez votre premier produit avec le formulaire ci-dessus</p>
         </div>
@@ -299,4 +300,4 @@ include '../includes/header.php';
 </div>
 
 </div></div>
-<?php include '../includes/footer.php'; ?>
+<?php include 'footer_admin.php'; ?>

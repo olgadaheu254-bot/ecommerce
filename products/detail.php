@@ -108,7 +108,7 @@ include '../includes/header.php';
 
     <!-- BREADCRUMB -->
     <div class="breadcrumb-hr">
-        <a href="/ecommerce/index.php">🏠 Accueil</a>
+        <a href="/ecommerce/index.php"> Accueil</a>
         <span>›</span>
         <a href="/ecommerce/products/index.php">Produits</a>
         <?php if(!empty($product['category_name'])): ?>
@@ -138,7 +138,7 @@ include '../includes/header.php';
             <div class="product-detail-card">
 
                 <?php if(!empty($product['category_name'])): ?>
-                    <span class="product-cat-badge">📦 <?= htmlspecialchars($product['category_name']) ?></span>
+                    <span class="product-cat-badge"> <?= htmlspecialchars($product['category_name']) ?></span>
                 <?php endif; ?>
 
                 <h1 class="product-name"><?= htmlspecialchars($product['name']) ?></h1>
@@ -156,11 +156,11 @@ include '../includes/header.php';
                 <!-- STOCK -->
                 <div class="mb-3">
                     <?php if($product['stock'] > 10): ?>
-                        <span class="stock-ok">✅ En stock (<?= $product['stock'] ?> disponibles)</span>
+                        <span class="stock-ok"> En stock (<?= $product['stock'] ?> disponibles)</span>
                     <?php elseif($product['stock'] > 0): ?>
-                        <span class="stock-low">⚠️ Stock limite (<?= $product['stock'] ?> restants)</span>
+                        <span class="stock-low"> Stock limite (<?= $product['stock'] ?> restants)</span>
                     <?php else: ?>
-                        <span class="stock-out">❌ Rupture de stock</span>
+                        <span class="stock-out"> Rupture de stock</span>
                     <?php endif; ?>
                 </div>
 
@@ -180,16 +180,16 @@ include '../includes/header.php';
                     <button class="btn-add-big" onclick="ajouterPanier()">
                         🛒 Ajouter au panier
                     </button>
-                    <button class="btn-wishlist" title="Ajouter aux favoris">❤️</button>
+                    <button class="btn-wishlist" id="btn-wishlist" onclick="toggleWishlist(<?= $product['id'] ?>)" title="Ajouter aux favoris"></button>
                 </div>
                 <?php endif; ?>
 
                 <!-- AVANTAGES -->
                 <div class="avantages">
-                    <div class="avantage-item"><span class="avantage-icon">🚚</span><span>Livraison gratuite des 50€</span></div>
-                    <div class="avantage-item"><span class="avantage-icon">↩️</span><span>Retour sous 30 jours</span></div>
-                    <div class="avantage-item"><span class="avantage-icon">🔒</span><span>Paiement securise</span></div>
-                    <div class="avantage-item"><span class="avantage-icon">🌿</span><span>Produits naturels</span></div>
+                    <div class="avantage-item"><span class="avantage-icon"></span><span>Livraison gratuite des 50€</span></div>
+                    <div class="avantage-item"><span class="avantage-icon"></span><span>Retour sous 30 jours</span></div>
+                    <div class="avantage-item"><span class="avantage-icon"></span><span>Paiement securise</span></div>
+                    <div class="avantage-item"><span class="avantage-icon"></span><span>Produits naturels</span></div>
                 </div>
 
             </div>
@@ -199,9 +199,9 @@ include '../includes/header.php';
     <!-- TABS DETAILS -->
     <div class="detail-tabs">
         <div class="tab-nav">
-            <button class="tab-nav-btn active" onclick="showTab('desc', this)">📝 Description</button>
-            <button class="tab-nav-btn" onclick="showTab('utilisation', this)">💡 Utilisation</button>
-            <button class="tab-nav-btn" onclick="showTab('livraison', this)">🚚 Livraison</button>
+            <button class="tab-nav-btn active" onclick="showTab('desc', this)"> Description</button>
+            <button class="tab-nav-btn" onclick="showTab('utilisation', this)"> Utilisation</button>
+            <button class="tab-nav-btn" onclick="showTab('livraison', this)"> Livraison</button>
         </div>
 
         <div id="tab-desc" class="tab-content active">
@@ -230,25 +230,25 @@ include '../includes/header.php';
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div style="background:#F5E6D3;border-radius:12px;padding:18px">
-                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">🚚 Livraison standard</h6>
+                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Livraison standard</h6>
                             <p style="margin:0">Delai : 3 a 5 jours ouvrables<br>Gratuite des 50€ d'achat<br>4,99€ en dessous de 50€</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div style="background:#F5E6D3;border-radius:12px;padding:18px">
-                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">⚡ Livraison express</h6>
+                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Livraison express</h6>
                             <p style="margin:0">Delai : 24h a 48h<br>Disponible en semaine<br>9,99€ quel que soit le montant</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div style="background:#F5E6D3;border-radius:12px;padding:18px">
-                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">↩️ Retours</h6>
+                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Retours</h6>
                             <p style="margin:0">Retour gratuit sous 30 jours<br>Produit non ouvert uniquement<br>Remboursement sous 5 jours</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div style="background:#F5E6D3;border-radius:12px;padding:18px">
-                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">📦 Emballage</h6>
+                            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Emballage</h6>
                             <p style="margin:0">Emballage eco-responsable<br>Protection garantie<br>Discret et soigne</p>
                         </div>
                     </div>
@@ -260,7 +260,7 @@ include '../includes/header.php';
     <!-- PRODUITS SIMILAIRES -->
     <?php if(count($similaires) > 0): ?>
     <div class="similaires-section">
-        <h3>✨ Vous aimerez aussi</h3>
+        <h3> Vous aimerez aussi</h3>
         <div class="row g-4">
             <?php foreach($similaires as $s): ?>
             <div class="col-lg-3 col-md-4 col-sm-6">
@@ -269,7 +269,7 @@ include '../includes/header.php';
                         <?php if(!empty($s['image'])): ?>
                             <img src="<?= htmlspecialchars($s['image']) ?>" alt="<?= htmlspecialchars($s['name']) ?>">
                         <?php else: ?>
-                            <div class="sim-img-ph">🌿</div>
+                            <div class="sim-img-ph"></div>
                         <?php endif; ?>
                     </div>
                     <div class="sim-body">
@@ -325,6 +325,26 @@ function showToast(msg, ok=true) {
     t.style.borderLeftColor = ok ? '#C9A84C' : '#C1622F';
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function toggleWishlist(productId) {
+    fetch('/ecommerce/cart/wishlist.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `product_id=${productId}`
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.redirect) { window.location = data.redirect; return; }
+        const btn = document.getElementById('btn-wishlist');
+        if(data.action === 'added') {
+            btn.textContent = '';
+            showToast(' Ajoute aux favoris !');
+        } else {
+            btn.textContent = '';
+            showToast(' Retire des favoris');
+        }
+    });
 }
 
 function showTab(id, btn) {

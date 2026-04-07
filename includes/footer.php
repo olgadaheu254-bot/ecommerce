@@ -35,13 +35,13 @@ function showToast(message, type) {
         <div class="newsletter-box">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-3 mb-lg-0">
-                    <h4 class="mb-1">💌 Rejoignez la communauté HairRoots</h4>
+                    <h4 class="mb-1"> Rejoignez la communauté HairRoots</h4>
                     <p class="mb-0 opacity-75">Recevez nos conseils capillaires, tendances et offres exclusives</p>
                 </div>
                 <div class="col-lg-6">
                     <form class="d-flex gap-2">
                         <input type="email" class="form-control newsletter-input" placeholder="Votre adresse email...">
-                        <button type="submit" class="btn btn-gold px-4 text-nowrap">S'abonner ✨</button>
+                        <button type="submit" class="btn btn-gold px-4 text-nowrap">S'abonner </button>
                     </form>
                 </div>
             </div>
@@ -55,7 +55,7 @@ function showToast(message, type) {
         <div class="row g-4 py-5">
             <!-- Brand -->
             <div class="col-lg-4 col-md-6">
-                <div class="footer-brand mb-3">🌿 HairRoots</div>
+                <div class="footer-brand mb-3"> HairRoots</div>
                 <p class="footer-text">Votre destination capillaire pour tous les types de cheveux. Mèches, soins et coiffeuses expertes pour femmes, hommes et enfants.</p>
                 <div class="d-flex gap-3 mt-3">
                     <a href="#" class="footer-social"><i class="bi bi-facebook"></i></a>
@@ -69,11 +69,11 @@ function showToast(message, type) {
             <div class="col-lg-2 col-md-6">
                 <h6 class="footer-title">Boutique</h6>
                 <ul class="list-unstyled footer-links">
-                    <li><a href="/ecommerce/products/index.php?category=1">🌀 Mèches Bouclées</a></li>
-                    <li><a href="/ecommerce/products/index.php?category=2">✨ Mèches Crépues</a></li>
-                    <li><a href="/ecommerce/products/index.php?category=3">💫 Mèches Lisses</a></li>
-                    <li><a href="/ecommerce/products/index.php?category=4">🌊 Mèches Ondulées</a></li>
-                    <li><a href="/ecommerce/products/index.php?category=5">🌿 Soins Cheveux</a></li>
+                    <li><a href="/ecommerce/products/index.php?category=1"> Mèches Bouclées</a></li>
+                    <li><a href="/ecommerce/products/index.php?category=2"> Mèches Crépues</a></li>
+                    <li><a href="/ecommerce/products/index.php?category=3"> Mèches Lisses</a></li>
+                    <li><a href="/ecommerce/products/index.php?category=4"> Mèches Ondulées</a></li>
+                    <li><a href="/ecommerce/products/index.php?category=5"> Soins Cheveux</a></li>
                 </ul>
             </div>
 
@@ -81,11 +81,11 @@ function showToast(message, type) {
             <div class="col-lg-2 col-md-6">
                 <h6 class="footer-title">Services</h6>
                 <ul class="list-unstyled footer-links">
-                    <li><a href="/ecommerce/coiffeuses.php">💼 Nos Coiffeuses</a></li>
-                    <li><a href="/ecommerce/coiffures.php">💇‍♀️ Inspirations</a></li>
-                    <li><a href="/ecommerce/rendez-vous.php">📅 Prendre RDV</a></li>
-                    <li><a href="#">📦 Suivi commande</a></li>
-                    <li><a href="#">💬 Conseils capillaires</a></li>
+                    <li><a href="/ecommerce/coiffeuses.php"> Nos Coiffeuses</a></li>
+                    <li><a href="/ecommerce/coiffures.php"> Inspirations</a></li>
+                    <li><a href="/ecommerce/rendez-vous.php"> Prendre RDV</a></li>
+                    <li><a href="#"> Suivi commande</a></li>
+                    <li><a href="#"> Conseils capillaires</a></li>
                 </ul>
             </div>
 
@@ -93,15 +93,15 @@ function showToast(message, type) {
             <div class="col-lg-4 col-md-6">
                 <h6 class="footer-title">Nous contacter</h6>
                 <ul class="list-unstyled footer-links">
-                    <li>📍 Paris, France</li>
-                    <li>📞 +33 1 23 45 67 89</li>
-                    <li>✉️ contact@hairroots.fr</li>
-                    <li class="mt-2">🕐 Lun-Sam : 9h - 19h</li>
+                    <li> Paris, France</li>
+                    <li> +33 1 23 45 67 89</li>
+                    <li> contact@hairroots.fr</li>
+                    <li class="mt-2"> Lun-Sam : 9h - 19h</li>
                 </ul>
                 <div class="mt-3 d-flex gap-2 flex-wrap">
-                    <span class="payment-badge">💳 CB</span>
-                    <span class="payment-badge">📱 PayPal</span>
-                    <span class="payment-badge">🍎 Apple Pay</span>
+                    <span class="payment-badge"> CB</span>
+                    <span class="payment-badge"> PayPal</span>
+                    <span class="payment-badge"> Apple Pay</span>
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@ function showToast(message, type) {
 
         <div class="row py-3 align-items-center">
             <div class="col-md-6 text-center text-md-start">
-                <p class="mb-0 footer-text small">© <?php echo date('Y'); ?> HairRoots 🌿 — Tous droits réservés</p>
+                <p class="mb-0 footer-text small">© <?php echo date('Y'); ?> HairRoots  — Tous droits réservés</p>
             </div>
             <div class="col-md-6 text-center text-md-end">
                 <a href="#" class="footer-link-sm me-3">Conditions générales</a>

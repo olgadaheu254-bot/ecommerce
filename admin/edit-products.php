@@ -82,7 +82,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include '../includes/header.php';
+include 'header_admin.php';';
 ?>
 
 <div class="container-fluid my-4">
@@ -269,4 +269,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'footer_admin.php'; ?>

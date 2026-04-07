@@ -83,7 +83,7 @@ include '../includes/header.php';
 
 <div class="admin-header">
     <div>
-        <h1>📅 Gestion des Rendez-vous</h1>
+        <h1> Gestion des Rendez-vous</h1>
         <p style="color:rgba(255,255,255,0.6);margin:5px 0 0;font-size:0.88rem">HairRoots Admin</p>
     </div>
     <div class="d-flex gap-3 flex-wrap">
@@ -187,7 +187,7 @@ include '../includes/header.php';
         <?php if(!empty($a['message'])): ?>
         <tr style="background:#FDFAF7">
             <td colspan="8" style="padding:8px 16px;font-size:0.8rem;color:#6B3A2A;border-bottom:1px solid #F5E6D3">
-                💬 <em><?= htmlspecialchars($a['message']) ?></em>
+                 <em><?= htmlspecialchars($a['message']) ?></em>
             </td>
         </tr>
         <?php endif; ?>
@@ -197,7 +197,7 @@ include '../includes/header.php';
     </div>
     <?php else: ?>
     <div class="empty-state">
-        <div style="font-size:3rem;margin-bottom:15px">📅</div>
+        <div style="font-size:3rem;margin-bottom:15px"></div>
         <h5 style="color:#3E1F0D">Aucun rendez-vous</h5>
         <p>Aucun RDV ne correspond a vos filtres.</p>
     </div>

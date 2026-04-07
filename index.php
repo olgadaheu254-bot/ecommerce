@@ -16,22 +16,22 @@ $coiffeuses = $stmt->fetchAll();
 <div class="container-fluid p-0">
 
     <!-- HERO -->
-    <section style="background: linear-gradient(135deg, #FDF0E8 0%, #FDEBD0 50%, #F5E6D3 100%); padding: 80px 0; position: relative; overflow: hidden;">
+   <section style="background: #FF6B9D; padding: 80px 0; position: relative; overflow: hidden;">
         <div style="position:absolute;top:-50px;right:-50px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,0.15),transparent);border-radius:50%;"></div>
         <div style="position:absolute;bottom:-50px;left:-50px;width:300px;height:300px;background:radial-gradient(circle,rgba(193,98,47,0.1),transparent);border-radius:50%;"></div>
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-7">
                     <div class="mb-4 d-flex flex-wrap gap-2">
-                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;">👩 Femmes</span>
-                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;">👨 Hommes</span>
-                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;">🧒 Enfants</span>
-                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;">🌍 Tous types</span>
+                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;"> Femmes</span>
+                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;"> Hommes</span>
+                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;"> Enfants</span>
+                        <span style="background:#fff;border:2px solid #C9A84C;color:#3E1F0D;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;"> Tous types</span>
                     </div>
                     <h1 style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:#3E1F0D;line-height:1.2;">
                         Sublimez vos<br>
                         <span style="color:#C1622F;">Racines</span> avec<br>
-                        <span style="color:#C9A84C;">HairRoots 🌿</span>
+                        <span style="color:#C9A84C;">HairRoots </span>
                     </h1>
                     <p style="font-size:1.1rem;color:#6B3A2A;margin:20px 0;">
                         Mèches adaptées, soins capillaires premium et coiffeuses expertes —<br>
@@ -39,18 +39,18 @@ $coiffeuses = $stmt->fetchAll();
                     </p>
                     <div class="d-flex gap-3 flex-wrap mt-4">
                         <a href="products/index.php" class="btn btn-gold btn-lg px-4">
-                            🛍️ Découvrir nos produits
+                             Découvrir nos produits
                         </a>
                         <a href="rendez-vous.php" 
                            style="background:transparent;border:2px solid #3E1F0D;color:#3E1F0D;padding:12px 28px;border-radius:25px;font-weight:600;font-size:1rem;text-decoration:none;"
                            onmouseover="this.style.background='#3E1F0D';this.style.color='#fff'"
                            onmouseout="this.style.background='transparent';this.style.color='#3E1F0D'">
-                            📅 Prendre RDV
+                             Prendre RDV
                         </a>
                     </div>
                 </div>
                 <div class="col-lg-5 text-center d-none d-lg-block">
-                    <div style="font-size:11rem;line-height:1;filter:drop-shadow(0 20px 40px rgba(193,98,47,0.2));animation:float 3s ease-in-out infinite;">🌿</div>
+                    <div style="font-size:11rem;line-height:1;filter:drop-shadow(0 20px 40px rgba(193,98,47,0.2));animation:float 3s ease-in-out infinite;"></div>
                 </div>
             </div>
         </div>
@@ -75,10 +75,10 @@ $coiffeuses = $stmt->fetchAll();
         <div class="row g-3">
             <?php
             $types = [
-                ['nom'=>'Bouclés', 'icon'=>'🌀', 'bg'=>'linear-gradient(135deg,#8B4513,#C1622F)', 'cat'=>1],
-                ['nom'=>'Crépus',  'icon'=>'✨', 'bg'=>'linear-gradient(135deg,#2c1810,#6B3A2A)', 'cat'=>2],
-                ['nom'=>'Lisses',  'icon'=>'💫', 'bg'=>'linear-gradient(135deg,#C9A84C,#8B7355)', 'cat'=>3],
-                ['nom'=>'Ondulés', 'icon'=>'🌊', 'bg'=>'linear-gradient(135deg,#A0522D,#D2691E)', 'cat'=>4],
+                ['nom'=>'Bouclés', 'icon'=>'#', 'bg'=>'linear-gradient(135deg,#8B4513,#C1622F)', 'cat'=>1],
+                ['nom'=>'Crépus',  'icon'=>'#', 'bg'=>'linear-gradient(135deg,#2c1810,#6B3A2A)', 'cat'=>2],
+                ['nom'=>'Lisses',  'icon'=>'#', 'bg'=>'linear-gradient(135deg,#C9A84C,#8B7355)', 'cat'=>3],
+                ['nom'=>'Ondulés', 'icon'=>'#', 'bg'=>'linear-gradient(135deg,#A0522D,#D2691E)', 'cat'=>4],
             ];
             foreach($types as $t): ?>
             <div class="col-md-3 col-6">
@@ -99,7 +99,7 @@ $coiffeuses = $stmt->fetchAll();
     <!-- PRODUITS VEDETTES -->
     <?php if(!empty($featured_products)): ?>
     <section class="mb-5">
-        <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#3E1F0D;text-align:center;">⭐ Nos Produits Vedettes</h2>
+        <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#3E1F0D;text-align:center;"> Nos Produits Vedettes</h2>
         <div class="gold-line mx-auto"></div>
         <div class="row g-4 mt-2">
             <?php foreach($featured_products as $p): ?>
@@ -111,7 +111,7 @@ $coiffeuses = $stmt->fetchAll();
                                  alt="<?= htmlspecialchars($p['name']) ?>"
                                  style="width:100%;height:100%;object-fit:cover;object-position:top;">
                         </div>
-                        <span class="badge-featured">⭐ Vedette</span>
+                        <span class="badge-featured"> Vedette</span>
                         <div class="product-overlay">
                             <a href="products/detail.php?id=<?= $p['id'] ?>" class="overlay-btn">👁 Voir</a>
                         </div>
@@ -122,7 +122,7 @@ $coiffeuses = $stmt->fetchAll();
                         <div class="product-footer">
                             <span class="product-price"><?= number_format($p['price'], 2) ?>€</span>
                             <button class="btn-add-cart" onclick="addToCart(<?= $p['id'] ?>)">
-                                🛒 Ajouter
+                                 Ajouter
                             </button>
                         </div>
                     </div>
@@ -171,7 +171,7 @@ $coiffeuses = $stmt->fetchAll();
     <!-- COIFFEUSES -->
     <?php if(!empty($coiffeuses)): ?>
     <section class="mb-5">
-        <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#3E1F0D;text-align:center;">💼 Nos Coiffeuses Expertes</h2>
+        <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#3E1F0D;text-align:center;"> Nos Coiffeuses Expertes</h2>
         <div class="gold-line mx-auto"></div>
         <div class="row g-4 justify-content-center mt-2">
             <?php foreach($coiffeuses as $c): ?>
@@ -192,7 +192,7 @@ $coiffeuses = $stmt->fetchAll();
                         <p style="color:#6B3A2A;font-size:0.88rem;"><?= htmlspecialchars($c['specialite']) ?></p>
                         <p style="font-size:0.85rem;color:#888;"><?= htmlspecialchars($c['bio']) ?></p>
                         <a href="rendez-vous.php?coiffeuse=<?= $c['id'] ?>" class="btn btn-gold w-100 mt-2">
-                            📅 Prendre RDV
+                             Prendre RDV
                         </a>
                     </div>
                 </div>
@@ -209,10 +209,10 @@ $coiffeuses = $stmt->fetchAll();
         <div class="row g-4 mt-2">
             <?php
             $avantages = [
-                ['icon'=>'🚚','titre'=>'Livraison rapide',       'texte'=>'Livraison sous 48h partout en France',            'bg'=>'#FFF3E0'],
-                ['icon'=>'✂️','titre'=>'Experts capillaires',    'texte'=>'Coiffeuses professionnelles certifiées',           'bg'=>'#F3E5F5'],
-                ['icon'=>'🌿','titre'=>'Produits naturels',      'texte'=>'Soins à base d\'ingrédients naturels de qualité', 'bg'=>'#E8F5E9'],
-                ['icon'=>'🎯','titre'=>'Conseils personnalisés', 'texte'=>'Adaptés à votre type de cheveux spécifique',      'bg'=>'#FFF8E1'],
+                ['icon'=>'#','titre'=>'Livraison rapide',       'texte'=>'Livraison sous 48h partout en France',            'bg'=>'#FFF3E0'],
+                ['icon'=>'#','titre'=>'Experts capillaires',    'texte'=>'Coiffeuses professionnelles certifiées',           'bg'=>'#F3E5F5'],
+                ['icon'=>'#','titre'=>'Produits naturels',      'texte'=>'Soins à base d\'ingrédients naturels de qualité', 'bg'=>'#E8F5E9'],
+                ['icon'=>'#','titre'=>'Conseils personnalisés', 'texte'=>'Adaptés à votre type de cheveux spécifique',      'bg'=>'#FFF8E1'],
             ];
             foreach($avantages as $a): ?>
             <div class="col-md-3 col-sm-6">
@@ -235,12 +235,12 @@ $coiffeuses = $stmt->fetchAll();
     <section class="mb-5">
         <div class="p-5 text-center text-white rounded-4" 
              style="background:linear-gradient(135deg,#3E1F0D,#6B3A2A);position:relative;overflow:hidden;">
-            <div style="position:absolute;top:-30px;right:-30px;font-size:12rem;opacity:0.05;">✂️</div>
-            <h2 style="font-family:'Playfair Display',serif;font-size:2rem;">Prêt(e) à vous faire chouchouter ? 💆‍♀️</h2>
+            <div style="position:absolute;top:-30px;right:-30px;font-size:12rem;opacity:0.05;"></div>
+            <h2 style="font-family:'Playfair Display',serif;font-size:2rem;">Prêt(e) à vous faire chouchouter ? </h2>
             <p style="color:#e8d5b7;font-size:1.05rem;margin:15px 0;">
                 Réservez votre rendez-vous en ligne avec l'une de nos coiffeuses expertes
             </p>
-            <a href="rendez-vous.php" class="btn btn-gold btn-lg px-5 mt-2">📅 Réserver maintenant</a>
+            <a href="rendez-vous.php" class="btn btn-gold btn-lg px-5 mt-2"> Réserver maintenant</a>
         </div>
     </section>
 

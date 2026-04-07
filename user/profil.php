@@ -122,13 +122,13 @@ include '../includes/header.php';
                     <form method="POST" action="">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">Prénom *</label>
+                                <label for="first_name" class="form-label">Prénom </label>
                                 <input type="text" class="form-control" id="first_name" name="first_name" 
                                        value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Nom *</label>
+                                <label for="last_name" class="form-label">Nom </label>
                                 <input type="text" class="form-control" id="last_name" name="last_name" 
                                        value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
                             </div>
@@ -141,7 +141,7 @@ include '../includes/header.php';
                         </div>
                         
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email *</label>
+                            <label for="email" class="form-label">Email </label>
                             <input type="email" class="form-control" id="email" name="email" 
                                    value="<?php echo htmlspecialchars($user['email']); ?>" required>
                         </div>

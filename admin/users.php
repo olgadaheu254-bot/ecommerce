@@ -1,11 +1,7 @@
 <?php
+require_once 'auth_admin.php'; 
 require_once '../config/database.php';
 $page_title = 'Gestion Utilisateurs - HairRoots Admin';
-
-if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: /ecommerce/user/login.php');
-    exit;
-}
 
 $success = ''; $error = '';
 
@@ -28,13 +24,17 @@ if(isset($_GET['toggle']) && (int)$_GET['toggle'] !== (int)$_SESSION['user_id'])
 }
 
 // FILTRES
-$filtre_role = isset($_GET['role_filtre']) ? $_GET['role_filtre'] : '';
-$search      = isset($_GET['search'])      ? trim($_GET['search']) : '';
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-$where = []; $params = [];
-if($filtre_role) { $where[] = "role = ?";                       $params[] = $filtre_role; }
-if($search)      { $where[] = "(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR username LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%"]); }
-$where_sql = count($where) ? 'WHERE '.implode(' AND ',$where) : '';
+//  On affiche UNIQUEMENT les clients (role = 'user'), jamais les admins
+$where = ["u.role = 'user'"]; 
+$params = [];
+
+if($search) {
+    $where[] = "(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?)";
+    $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%"]);
+}
+$where_sql = 'WHERE '.implode(' AND ', $where);
 
 $stmt = $pdo->prepare("SELECT u.*, 
     (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) as nb_commandes,
@@ -44,20 +44,18 @@ $stmt = $pdo->prepare("SELECT u.*,
 $stmt->execute($params);
 $users = $stmt->fetchAll();
 
-// STATS
+// STATS (uniquement clients)
 $stats = $pdo->query("SELECT
     COUNT(*) as total,
-    SUM(CASE WHEN role='admin' THEN 1 ELSE 0 END) as admins,
-    SUM(CASE WHEN role='user' THEN 1 ELSE 0 END) as clients,
     SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as nouveaux_jour,
     SUM(CASE WHEN MONTH(created_at) = MONTH(NOW()) AND YEAR(created_at) = YEAR(NOW()) THEN 1 ELSE 0 END) as nouveaux_mois
-FROM users")->fetch();
+FROM users WHERE role = 'user'")->fetch();
 
 // DETAIL USER
 $detail_user = null;
 $user_orders = [];
 if(isset($_GET['detail'])) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id=?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id=? AND role='user'");
     $stmt->execute([(int)$_GET['detail']]);
     $detail_user = $stmt->fetch();
     if($detail_user) {
@@ -70,7 +68,7 @@ if(isset($_GET['detail'])) {
 function getInitiales($f,$l){ return strtoupper(substr($f,0,1).substr($l,0,1)); }
 function getAvatarColor($n){ $c=['#C1622F','#C9A84C','#6B3A2A','#3E1F0D','#8B4513','#A0522D']; return $c[ord($n[0])%count($c)]; }
 
-include '../includes/header.php';
+include 'header_admin.php';
 ?>
 <style>
 .admin-page{background:#FDF8F2;min-height:80vh;padding:30px 0}
@@ -101,10 +99,7 @@ include '../includes/header.php';
 .ptable tr:hover td{background:#FDFAF7}
 .avatar-init{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:0.85rem;font-family:'Playfair Display',serif;flex-shrink:0}
 .avatar-img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #F5E6D3}
-.badge-admin{background:linear-gradient(135deg,#C9A84C,#b8942e);color:#3E1F0D;padding:3px 12px;border-radius:10px;font-size:0.72rem;font-weight:700}
 .badge-user{background:#F5E6D3;color:#6B3A2A;padding:3px 12px;border-radius:10px;font-size:0.72rem;font-weight:700}
-.badge-actif{background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:8px;font-size:0.72rem;font-weight:700}
-.badge-inactif{background:#fce4e4;color:#c62828;padding:3px 10px;border-radius:8px;font-size:0.72rem;font-weight:700}
 .filter-bar{background:#fff;border-radius:14px;box-shadow:0 4px 15px rgba(62,31,13,0.05);border:1px solid #F5E6D3;padding:16px 20px;margin-bottom:20px}
 .alert-hr{border-radius:12px;padding:12px 18px;margin-bottom:20px;font-size:0.9rem;border:none}
 .alert-hr.success{background:#e8f5e9;color:#2e7d32;border-left:4px solid #2e7d32}
@@ -120,41 +115,35 @@ include '../includes/header.php';
 
 <div class="dash-header">
     <div>
-        <h1>👥 Gestion des Utilisateurs</h1>
-        <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($users) ?> utilisateur(s) affiches</p>
+        <h1> Gestion des Clients</h1>
+        <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($users) ?> client(s) affiché(s)</p>
     </div>
     <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn">📊 Dashboard</a>
-        <a href="products.php" class="dash-nav-btn">📦 Produits</a>
-        <a href="orders.php" class="dash-nav-btn">🛍️ Commandes</a>
-        <a href="users.php" class="dash-nav-btn active">👥 Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn">📅 RDV</a>
+        <a href="index.php" class="dash-nav-btn"> Dashboard</a>
+        <a href="products.php" class="dash-nav-btn"> Produits</a>
+        <a href="orders.php" class="dash-nav-btn"> Commandes</a>
+        <a href="users.php" class="dash-nav-btn active"> Utilisateurs</a>
+        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
     </div>
 </div>
 
-<?php if($success): ?><div class="alert-hr success">✅ <?= htmlspecialchars($success) ?></div><?php endif; ?>
+<?php if($success): ?><div class="alert-hr success"> <?= htmlspecialchars($success) ?></div><?php endif; ?>
 
 <!-- STATS -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4">
         <div class="stat-card">
             <div class="stat-num"><?= $stats['total'] ?></div>
-            <div class="stat-lbl">Total utilisateurs</div>
+            <div class="stat-lbl">Total clients</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card">
-            <div class="stat-num" style="color:#C1622F"><?= $stats['clients'] ?></div>
-            <div class="stat-lbl">Clients</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4">
         <div class="stat-card">
             <div class="stat-num" style="color:#C9A84C"><?= $stats['nouveaux_jour'] ?></div>
             <div class="stat-lbl">Nouveaux aujourd'hui</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4">
         <div class="stat-card">
             <div class="stat-num" style="color:#2e7d32"><?= $stats['nouveaux_mois'] ?></div>
             <div class="stat-lbl">Nouveaux ce mois</div>
@@ -165,12 +154,7 @@ include '../includes/header.php';
 <!-- FILTRES -->
 <div class="filter-bar">
     <form method="GET" action="" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <input type="text" class="pinput" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="🔍 Nom, email, username..." style="max-width:250px">
-        <select class="pinput" name="role_filtre" style="max-width:160px">
-            <option value="">Tous les roles</option>
-            <option value="user"  <?= $filtre_role==='user' ?'selected':'' ?>>👤 Clients</option>
-            <option value="admin" <?= $filtre_role==='admin'?'selected':'' ?>>👑 Admins</option>
-        </select>
+        <input type="text" class="pinput" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="🔍 Nom, email, username..." style="max-width:300px">
         <button type="submit" class="pbtn">Filtrer</button>
         <a href="users.php" style="background:#F5E6D3;color:#6B3A2A;border:none;border-radius:10px;padding:9px 16px;font-weight:600;font-size:0.85rem;text-decoration:none">Reset</a>
     </form>
@@ -179,17 +163,16 @@ include '../includes/header.php';
 <!-- TABLEAU -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5>📋 Liste des utilisateurs (<?= count($users) ?>)</h5>
+        <h5>👥 Liste des clients (<?= count($users) ?>)</h5>
     </div>
     <div style="overflow-x:auto">
     <?php if(count($users) > 0): ?>
     <table class="ptable">
         <thead><tr>
-            <th>Utilisateur</th>
+            <th>Client</th>
             <th>Contact</th>
-            <th>Role</th>
             <th>Commandes</th>
-            <th>Depenses</th>
+            <th>Dépenses</th>
             <th>RDV</th>
             <th>Inscrit le</th>
             <th>Actions</th>
@@ -218,28 +201,12 @@ include '../includes/header.php';
                     <div style="font-size:0.75rem;color:#9a7c5c"><?= htmlspecialchars($u['phone']) ?></div>
                 <?php endif; ?>
             </td>
-            <td>
-                <?php if($u['role']==='admin'): ?>
-                    <span class="badge-admin">👑 Admin</span>
-                <?php else: ?>
-                    <span class="badge-user">👤 Client</span>
-                <?php endif; ?>
-            </td>
             <td style="font-weight:700;text-align:center"><?= $u['nb_commandes'] ?></td>
             <td style="font-weight:700;color:#C1622F"><?= number_format($u['total_depense']??0,2) ?>€</td>
             <td style="text-align:center"><?= $u['nb_rdv'] ?></td>
             <td style="color:#9a7c5c;font-size:0.78rem"><?= date('d/m/Y',strtotime($u['created_at'])) ?></td>
             <td>
-                <div style="display:flex;gap:5px;flex-wrap:wrap">
-                    <a href="?detail=<?= $u['id'] ?>" class="pbtn pbtn-sm">👁️ Voir</a>
-                    <?php if($u['id'] != $_SESSION['user_id']): ?>
-                        <?php if($u['role']==='user'): ?>
-                            <a href="?role=admin&id=<?= $u['id'] ?>" class="pbtn-info" onclick="return confirm('Donner les droits admin ?')">👑</a>
-                        <?php else: ?>
-                            <a href="?role=user&id=<?= $u['id'] ?>" class="pbtn-danger" onclick="return confirm('Retirer les droits admin ?')">👤</a>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
+                <a href="?detail=<?= $u['id'] ?>" class="pbtn pbtn-sm"> Voir</a>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -248,7 +215,7 @@ include '../includes/header.php';
     <?php else: ?>
     <div style="text-align:center;padding:40px;color:#9a7c5c">
         <div style="font-size:3rem;margin-bottom:15px">👥</div>
-        <h5 style="color:#3E1F0D">Aucun utilisateur trouve</h5>
+        <h5 style="color:#3E1F0D">Aucun client trouvé</h5>
     </div>
     <?php endif; ?>
     </div>
@@ -280,41 +247,33 @@ include '../includes/header.php';
             <div style="background:#F5E6D3;border-radius:12px;padding:18px;margin-bottom:20px">
                 <div class="row g-2">
                     <div class="col-6"><span style="font-size:0.75rem;color:#9a7c5c">Email</span><br><strong style="font-size:0.88rem;color:#3E1F0D"><?= htmlspecialchars($detail_user['email']) ?></strong></div>
-                    <div class="col-6"><span style="font-size:0.75rem;color:#9a7c5c">Telephone</span><br><strong style="font-size:0.88rem;color:#3E1F0D"><?= htmlspecialchars($detail_user['phone']??'-') ?></strong></div>
-                    <div class="col-6 mt-2"><span style="font-size:0.75rem;color:#9a7c5c">Role</span><br>
-                        <?php if($detail_user['role']==='admin'): ?><span class="badge-admin">👑 Admin</span><?php else: ?><span class="badge-user">👤 Client</span><?php endif; ?>
-                    </div>
+                    <div class="col-6"><span style="font-size:0.75rem;color:#9a7c5c">Téléphone</span><br><strong style="font-size:0.88rem;color:#3E1F0D"><?= htmlspecialchars($detail_user['phone']??'-') ?></strong></div>
+                    <div class="col-6 mt-2"><span style="font-size:0.75rem;color:#9a7c5c">Statut</span><br><span class="badge-user">👤 Client</span></div>
                     <div class="col-6 mt-2"><span style="font-size:0.75rem;color:#9a7c5c">Inscrit le</span><br><strong style="font-size:0.88rem;color:#3E1F0D"><?= date('d/m/Y',strtotime($detail_user['created_at'])) ?></strong></div>
                 </div>
             </div>
 
             <!-- STATS USER -->
             <div class="row g-3 mb-4">
-                <div class="col-4">
+                <div class="col-6">
                     <div style="background:#fff;border:1px solid #F5E6D3;border-radius:12px;padding:14px;text-align:center">
                         <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#3E1F0D"><?= count($user_orders) ?></div>
                         <div style="font-size:0.72rem;color:#9a7c5c">Commandes</div>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-6">
                     <div style="background:#fff;border:1px solid #F5E6D3;border-radius:12px;padding:14px;text-align:center">
                         <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#C1622F"><?= number_format(array_sum(array_column($user_orders,'total_amount')),0) ?>€</div>
-                        <div style="font-size:0.72rem;color:#9a7c5c">Depenses</div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div style="background:#fff;border:1px solid #F5E6D3;border-radius:12px;padding:14px;text-align:center">
-                        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#C9A84C"><?= $detail_user['role']==='admin'?'👑':'👤' ?></div>
-                        <div style="font-size:0.72rem;color:#9a7c5c"><?= ucfirst($detail_user['role']) ?></div>
+                        <div style="font-size:0.72rem;color:#9a7c5c">Dépenses totales</div>
                     </div>
                 </div>
             </div>
 
             <!-- DERNIERES COMMANDES -->
             <?php if(count($user_orders) > 0): ?>
-            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px">🛍️ Dernieres commandes</h6>
+            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px"> Dernières commandes</h6>
             <?php
-            $sl=['pending'=>['En attente','#F57F17'],'processing'=>['En cours','#1565C0'],'shipped'=>['Expediee','#6A1B9A'],'delivered'=>['Livree','#2E7D32'],'cancelled'=>['Annulee','#C62828']];
+            $sl=['pending'=>['En attente','#F57F17'],'processing'=>['En cours','#1565C0'],'shipped'=>['Expédiée','#6A1B9A'],'delivered'=>['Livrée','#2E7D32'],'cancelled'=>['Annulée','#C62828']];
             foreach($user_orders as $o):
                 $s=$sl[$o['status']]??['?','#9a7c5c'];
             ?>
@@ -327,6 +286,8 @@ include '../includes/header.php';
                 <span style="background:<?= $s[1] ?>22;color:<?= $s[1] ?>;padding:3px 10px;border-radius:8px;font-size:0.72rem;font-weight:700"><?= $s[0] ?></span>
             </div>
             <?php endforeach; ?>
+            <?php else: ?>
+            <p style="color:#9a7c5c;font-size:0.85rem;text-align:center;padding:20px 0">Aucune commande pour ce client</p>
             <?php endif; ?>
 
         </div>
@@ -335,4 +296,4 @@ include '../includes/header.php';
 <?php endif; ?>
 
 </div></div>
-<?php include '../includes/footer.php'; ?>
+<?php include 'footer_admin.php'; ?>

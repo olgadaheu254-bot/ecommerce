@@ -1,12 +1,7 @@
 <?php
+require_once 'auth_admin.php'; 
 require_once '../config/database.php';
 $page_title = 'Dashboard Admin - HairRoots';
-
-// Protection admin
-if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: /ecommerce/user/login.php');
-    exit;
-}
 
 // STATS COMMANDES
 $stats_commandes = $pdo->query("SELECT 
@@ -58,7 +53,7 @@ $prochains_rdv = $pdo->query("SELECT a.*, c.prenom as c_prenom, c.nom as c_nom F
 // REVENUS PAR MOIS (6 derniers mois)
 $revenus_mois = $pdo->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as mois, DATE_FORMAT(created_at, '%b %Y') as mois_label, SUM(total_amount) as total FROM orders WHERE status != 'cancelled' AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(created_at, '%Y-%m') ORDER BY mois ASC")->fetchAll();
 
-include '../includes/header.php';
+include 'header_admin.php';
 ?>
 <style>
 .admin-dash{background:#FDF8F2;min-height:80vh;padding:30px 0}
@@ -132,15 +127,15 @@ include '../includes/header.php';
 <!-- HEADER -->
 <div class="dash-header">
     <div>
-        <h1>👑 Dashboard Admin</h1>
+        <h1> Dashboard Admin</h1>
         <p>Bonjour <?= htmlspecialchars($_SESSION['first_name']) ?> · <?= date('d/m/Y') ?></p>
     </div>
     <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn active">📊 Vue generale</a>
-        <a href="products.php" class="dash-nav-btn">📦 Produits</a>
-        <a href="orders.php" class="dash-nav-btn">🛍️ Commandes</a>
-        <a href="users.php" class="dash-nav-btn">👥 Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn">📅 RDV</a>
+        <a href="index.php" class="dash-nav-btn active"> Vue generale</a>
+        <a href="products.php" class="dash-nav-btn"> Produits</a>
+        <a href="orders.php" class="dash-nav-btn"> Commandes</a>
+        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
+        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
     </div>
 </div>
 
@@ -150,7 +145,7 @@ include '../includes/header.php';
     <!-- REVENU -->
     <div class="col-lg-3 col-md-6">
         <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#FFF8E1,#FDEBD0)">💰</div>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#FFF8E1,#FDEBD0)"></div>
             <div class="stat-num"><?= number_format($stats_commandes['revenu_total']??0,0,'.',''.' ') ?>€</div>
             <div class="stat-label">Revenu total</div>
             <div class="stat-sub">
@@ -163,7 +158,7 @@ include '../includes/header.php';
     <!-- COMMANDES -->
     <div class="col-lg-3 col-md-6">
         <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)">🛍️</div>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)"></div>
             <div class="stat-num"><?= $stats_commandes['total']??0 ?></div>
             <div class="stat-label">Commandes totales</div>
             <div class="stat-sub">
@@ -176,7 +171,7 @@ include '../includes/header.php';
     <!-- UTILISATEURS -->
     <div class="col-lg-3 col-md-6">
         <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">👥</div>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"></div>
             <div class="stat-num"><?= $stats_users['total']??0 ?></div>
             <div class="stat-label">Clients inscrits</div>
             <div class="stat-sub">
@@ -189,7 +184,7 @@ include '../includes/header.php';
     <!-- RDV -->
     <div class="col-lg-3 col-md-6">
         <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7)">📅</div>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7)"></div>
             <div class="stat-num"><?= $stats_rdv['total']??0 ?></div>
             <div class="stat-label">Rendez-vous</div>
             <div class="stat-sub">
@@ -203,7 +198,7 @@ include '../includes/header.php';
 <!-- ALERTES -->
 <?php if(($stats_produits['rupture']??0) > 0 || ($stats_produits['stock_faible']??0) > 0): ?>
 <div style="background:#FFF8E1;border:1px solid #F57F17;border-radius:14px;padding:14px 20px;margin-bottom:25px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <span style="font-size:1.4rem">⚠️</span>
+    <span style="font-size:1.4rem"></span>
     <div style="flex:1">
         <?php if($stats_produits['rupture'] > 0): ?>
             <strong style="color:#F57F17"><?= $stats_produits['rupture'] ?> produit(s) en rupture de stock</strong>
@@ -228,7 +223,7 @@ include '../includes/header.php';
         ?>
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5>📈 Revenus des 6 derniers mois</h5>
+                <h5> Revenus des 6 derniers mois</h5>
             </div>
             <div class="dash-card-body">
                 <div class="chart-bar-wrap">
@@ -249,7 +244,7 @@ include '../includes/header.php';
         <!-- DERNIERES COMMANDES -->
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5>🛍️ Dernieres commandes</h5>
+                <h5> Dernieres commandes</h5>
                 <a href="orders.php" class="dash-link">Voir toutes →</a>
             </div>
             <div class="dash-card-body" style="padding:0">
@@ -290,7 +285,7 @@ include '../includes/header.php';
         <?php if(count($prochains_rdv) > 0): ?>
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5>📅 Prochains rendez-vous</h5>
+                <h5> Prochains rendez-vous</h5>
                 <a href="appointments.php" class="dash-link">Voir tous →</a>
             </div>
             <div class="dash-card-body" style="padding:0">
@@ -325,23 +320,23 @@ include '../includes/header.php';
 
         <!-- ACTIONS RAPIDES -->
         <div class="dash-card mb-4">
-            <div class="dash-card-header"><h5>⚡ Actions rapides</h5></div>
+            <div class="dash-card-header"><h5> Actions rapides</h5></div>
             <div class="dash-card-body">
                 <div class="quick-actions">
                     <a href="products.php?action=add" class="qa-btn">
-                        <div class="qa-btn-icon">➕</div>
+                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Nouveau produit</div>
                     </a>
                     <a href="appointments.php" class="qa-btn">
-                        <div class="qa-btn-icon">📅</div>
+                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Voir les RDV</div>
                     </a>
                     <a href="orders.php?status=pending" class="qa-btn">
-                        <div class="qa-btn-icon">🔔</div>
+                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Commandes en attente</div>
                     </a>
                     <a href="users.php" class="qa-btn">
-                        <div class="qa-btn-icon">👥</div>
+                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Voir les clients</div>
                     </a>
                 </div>
@@ -352,7 +347,7 @@ include '../includes/header.php';
         <?php if(count($ruptures) > 0): ?>
         <div class="dash-card mb-4">
             <div class="dash-card-header">
-                <h5>⚠️ Ruptures de stock</h5>
+                <h5> Ruptures de stock</h5>
                 <a href="products.php" class="dash-link">Gerer →</a>
             </div>
             <div class="dash-card-body">
@@ -367,7 +362,7 @@ include '../includes/header.php';
                     </div>
                     <div style="flex:1">
                         <div style="font-weight:600;color:#3E1F0D;font-size:0.83rem"><?= htmlspecialchars($p['name']) ?></div>
-                        <div style="color:#c62828;font-size:0.72rem;font-weight:600">❌ Rupture</div>
+                        <div style="color:#c62828;font-size:0.72rem;font-weight:600"> Rupture</div>
                     </div>
                     <a href="products.php?edit=<?= $p['id'] ?>" style="background:#fce4e4;color:#c62828;padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;text-decoration:none">Modifier</a>
                 </div>
@@ -402,4 +397,4 @@ include '../includes/header.php';
 </div>
 
 </div></div>
-<?php include '../includes/footer.php'; ?>
+<?php include 'footer_admin.php'; ?>

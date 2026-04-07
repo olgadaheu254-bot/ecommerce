@@ -1,4 +1,5 @@
 <?php
+require_once 'auth_admin.php'; 
 require_once '../config/database.php';
 $page_title = 'Gestion Commandes - HairRoots Admin';
 
@@ -60,7 +61,7 @@ if(isset($_GET['detail'])) {
     }
 }
 
-include '../includes/header.php';
+include 'header_admin.php';
 
 $sl = [
     'pending'    => ['En attente',    'b-attente',  '#F57F17'],
@@ -119,19 +120,19 @@ $sl = [
 
 <div class="dash-header">
     <div>
-        <h1>🛍️ Gestion des Commandes</h1>
+        <h1> Gestion des Commandes</h1>
         <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($orders) ?> commande(s) affichee(s)</p>
     </div>
     <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn">📊 Dashboard</a>
-        <a href="products.php" class="dash-nav-btn">📦 Produits</a>
-        <a href="orders.php" class="dash-nav-btn active">🛍️ Commandes</a>
-        <a href="users.php" class="dash-nav-btn">👥 Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn">📅 RDV</a>
+        <a href="index.php" class="dash-nav-btn"> Dashboard</a>
+        <a href="products.php" class="dash-nav-btn"> Produits</a>
+        <a href="orders.php" class="dash-nav-btn active"> Commandes</a>
+        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
+        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
     </div>
 </div>
 
-<?php if($success): ?><div class="alert-hr success">✅ <?= htmlspecialchars($success) ?></div><?php endif; ?>
+<?php if($success): ?><div class="alert-hr success"> <?= htmlspecialchars($success) ?></div><?php endif; ?>
 
 <!-- STATS RAPIDES -->
 <div class="row g-3 mb-4">
@@ -176,7 +177,7 @@ $sl = [
 <!-- TABLEAU COMMANDES -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5>📋 Liste des commandes</h5>
+        <h5> Liste des commandes</h5>
         <span style="color:#9a7c5c;font-size:0.82rem">Revenu total : <strong style="color:#C1622F"><?= number_format($stats['revenu'],2) ?>€</strong></span>
     </div>
     <div style="overflow-x:auto">
@@ -220,7 +221,7 @@ $sl = [
     </table>
     <?php else: ?>
     <div style="text-align:center;padding:40px;color:#9a7c5c">
-        <div style="font-size:3rem;margin-bottom:15px">🛍️</div>
+        <div style="font-size:3rem;margin-bottom:15px"></div>
         <h5 style="color:#3E1F0D">Aucune commande trouvee</h5>
     </div>
     <?php endif; ?>
@@ -244,7 +245,7 @@ $sl = [
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div style="background:#F5E6D3;border-radius:12px;padding:15px">
-                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">👤 Client</h6>
+                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Client</h6>
                         <p style="margin:3px 0;font-size:0.88rem;color:#6B3A2A"><strong><?= htmlspecialchars($detail_order['first_name'].' '.$detail_order['last_name']) ?></strong></p>
                         <p style="margin:3px 0;font-size:0.82rem;color:#6B3A2A"><?= htmlspecialchars($detail_order['email']) ?></p>
                         <?php if(!empty($detail_order['phone'])): ?>
@@ -254,20 +255,20 @@ $sl = [
                 </div>
                 <div class="col-md-6">
                     <div style="background:#F5E6D3;border-radius:12px;padding:15px">
-                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">📍 Adresse de livraison</h6>
+                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Adresse de livraison</h6>
                         <p style="margin:0;font-size:0.82rem;color:#6B3A2A;white-space:pre-line"><?= htmlspecialchars($detail_order['shipping_address']??'Non renseignee') ?></p>
                     </div>
                 </div>
             </div>
 
             <!-- ARTICLES -->
-            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px">🛍️ Articles commandes</h6>
+            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px"> Articles commandes</h6>
             <?php foreach($detail_items as $item): ?>
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F5E6D3">
                 <?php if(!empty($item['image'])): ?>
                     <img src="<?= htmlspecialchars($item['image']) ?>" style="width:50px;height:50px;border-radius:8px;object-fit:cover;flex-shrink:0">
                 <?php else: ?>
-                    <div style="width:50px;height:50px;border-radius:8px;background:#F5E6D3;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🌿</div>
+                    <div style="width:50px;height:50px;border-radius:8px;background:#F5E6D3;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0"></div>
                 <?php endif; ?>
                 <div style="flex:1">
                     <div style="font-weight:600;color:#3E1F0D;font-size:0.88rem"><?= htmlspecialchars($item['name']) ?></div>
@@ -285,7 +286,7 @@ $sl = [
 
             <!-- CHANGER STATUT -->
             <div style="background:#F5E6D3;border-radius:12px;padding:15px;margin-top:20px">
-                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px">🔄 Changer le statut</h6>
+                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px"> Changer le statut</h6>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <?php foreach($sl as $val=>$info): ?>
                     <a href="?statut=<?= $val ?>&id=<?= $detail_order['id'] ?>&detail=<?= $detail_order['id'] ?>"
@@ -298,7 +299,7 @@ $sl = [
 
             <?php if(!empty($detail_order['notes'])): ?>
             <div style="background:#FFF8E1;border-radius:12px;padding:15px;margin-top:15px">
-                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:5px">💬 Notes client</h6>
+                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:5px"> Notes client</h6>
                 <p style="margin:0;font-size:0.85rem;color:#6B3A2A"><?= htmlspecialchars($detail_order['notes']) ?></p>
             </div>
             <?php endif; ?>
@@ -316,4 +317,4 @@ function changerStatut(orderId, newStatut) {
 }
 </script>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'footer_admin.php'; ?>

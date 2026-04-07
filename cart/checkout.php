@@ -140,7 +140,7 @@ include '../includes/header.php';
 <?php if($success): ?>
 <!-- CONFIRMATION COMMANDE -->
 <div class="success-box">
-    <div class="success-icon">🎉</div>
+    <div class="success-icon"></div>
     <h2 style="font-family:'Playfair Display',serif;color:#3E1F0D;font-size:2rem">Commande confirmee !</h2>
     <p style="color:#6B3A2A;font-size:1rem;margin:10px 0">Merci pour votre commande. Vous allez recevoir un email de confirmation.</p>
     <div style="background:linear-gradient(135deg,#F5E6D3,#FDEBD0);border-radius:14px;padding:20px;display:inline-block;margin:20px 0">
@@ -167,7 +167,7 @@ else: ?>
 </div>
 
 <h1 style="font-family:'Playfair Display',serif;color:#3E1F0D;font-size:2rem;font-weight:900;margin-bottom:25px">
-    💳 Finaliser ma commande
+     Finaliser ma commande
 </h1>
 
 <?php if($error): ?><div class="alert-hr error mb-4"><?= htmlspecialchars($error) ?></div><?php endif; ?>
@@ -258,10 +258,10 @@ else: ?>
         <div class="co-card-body">
             <?php
             $pay_options = [
-                ['value'=>'Carte bancaire',       'icon'=>'💳', 'label'=>'Carte bancaire',       'desc'=>'Visa, Mastercard, CB'],
-                ['value'=>'PayPal',               'icon'=>'📱', 'label'=>'PayPal',               'desc'=>'Paiement securise via PayPal'],
-                ['value'=>'Apple Pay',            'icon'=>'🍎', 'label'=>'Apple Pay',            'desc'=>'Paiement rapide avec Apple Pay'],
-                ['value'=>'Paiement a la livraison','icon'=>'💵','label'=>'Paiement a la livraison','desc'=>'Payez en especes a la reception'],
+                ['value'=>'Carte bancaire',       'icon'=>'', 'label'=>'Carte bancaire',       'desc'=>'Visa, Mastercard, CB'],
+                ['value'=>'PayPal',               'icon'=>'', 'label'=>'PayPal',               'desc'=>'Paiement securise via PayPal'],
+                ['value'=>'Apple Pay',            'icon'=>'', 'label'=>'Apple Pay',            'desc'=>'Paiement rapide avec Apple Pay'],
+                ['value'=>'Paiement a la livraison','icon'=>'','label'=>'Paiement a la livraison','desc'=>'Payez en especes a la reception'],
             ];
             foreach($pay_options as $i => $opt): ?>
             <label class="pay-option <?= $i===0?'selected':'' ?>" onclick="selectPay(this)">

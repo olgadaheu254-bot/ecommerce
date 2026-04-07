@@ -73,7 +73,7 @@ include '../includes/header.php';
 
 <div class="mb-4">
     <h1 style="font-family:'Playfair Display',serif;color:#3E1F0D;font-size:2rem;font-weight:900">
-        🛒 Mon Panier
+         Mon Panier
         <?php if(count($cart_items)>0): ?>
         <span style="background:#F5E6D3;color:#C1622F;font-size:1rem;padding:4px 14px;border-radius:15px;font-family:'Poppins',sans-serif;font-weight:700;vertical-align:middle;margin-left:10px">
             <?= count($cart_items) ?> article<?= count($cart_items)>1?'s':'' ?>
@@ -142,7 +142,7 @@ include '../includes/header.php';
     <div class="col-lg-4">
         <div class="summary-card">
             <div class="summary-header">
-                <h5>🧾 Récapitulatif</h5>
+                <h5> Récapitulatif</h5>
             </div>
             <div class="summary-body">
 
@@ -150,14 +150,14 @@ include '../includes/header.php';
                 <?php if($total < 50): ?>
                 <div style="margin-bottom:15px;">
                     <div style="font-size:0.82rem;color:#6B3A2A;margin-bottom:6px;">
-                        Plus que <strong style="color:#C1622F"><?= number_format(50-$total,2) ?>€</strong> pour la livraison gratuite 🚚
+                        Plus que <strong style="color:#C1622F"><?= number_format(50-$total,2) ?>€</strong> pour la livraison gratuite 
                     </div>
                     <div class="livraison-progress">
                         <div class="livraison-progress-bar" style="width:<?= min(100,($total/50)*100) ?>%"></div>
                     </div>
                 </div>
                 <?php else: ?>
-                <div class="livraison-badge">✅ Livraison gratuite débloquée !</div>
+                <div class="livraison-badge"> Livraison gratuite débloquée !</div>
                 <?php endif; ?>
 
                 <div class="summary-row">
@@ -167,7 +167,7 @@ include '../includes/header.php';
                 <div class="summary-row">
                     <span>Livraison</span>
                     <?php if($livraison == 0): ?>
-                        <strong style="color:#2e7d32">Gratuite 🎉</strong>
+                        <strong style="color:#2e7d32">Gratuite </strong>
                     <?php else: ?>
                         <strong><?= number_format($livraison,2) ?>€</strong>
                     <?php endif; ?>
@@ -180,10 +180,10 @@ include '../includes/header.php';
 
                 <div class="mt-4">
                     <?php if(isset($_SESSION['user_id'])): ?>
-                        <a href="checkout.php" class="btn-checkout">💳 Passer la commande</a>
+                        <a href="checkout.php" class="btn-checkout"> Passer la commande</a>
                     <?php else: ?>
                         <a href="/ecommerce/user/login.php?redirect=/ecommerce/cart/checkout.php" class="btn-checkout">
-                            🔑 Se connecter pour commander
+                             Se connecter pour commander
                         </a>
                     <?php endif; ?>
                     <a href="/ecommerce/index.php" class="btn-continue">← Continuer mes achats</a>
@@ -191,11 +191,11 @@ include '../includes/header.php';
 
                 <!-- PAIEMENT SECURISE -->
                 <div class="mt-4 text-center">
-                    <p style="font-size:0.78rem;color:#9a7c5c;margin-bottom:8px;">🔒 Paiement 100% sécurisé</p>
+                    <p style="font-size:0.78rem;color:#9a7c5c;margin-bottom:8px;"> Paiement 100% sécurisé</p>
                     <div class="d-flex justify-content-center gap-2">
-                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600">💳 CB</span>
-                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600">📱 PayPal</span>
-                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600">🍎 Apple Pay</span>
+                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600"> CB</span>
+                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600"> PayPal</span>
+                        <span style="background:#F5E6D3;color:#3E1F0D;padding:4px 12px;border-radius:8px;font-size:0.75rem;font-weight:600"> Apple Pay</span>
                     </div>
                 </div>
             </div>
@@ -209,15 +209,15 @@ include '../includes/header.php';
 <div class="cart-card">
     <div class="cart-card-body">
         <div class="empty-cart">
-            <div class="empty-cart-icon">🛒</div>
+            <div class="empty-cart-icon"></div>
             <h3 style="font-family:'Playfair Display',serif;color:#3E1F0D;">Votre panier est vide</h3>
             <p style="color:#9a7c5c;font-size:1rem;margin:10px 0 30px;">Découvrez nos mèches et soins capillaires adaptés à vos cheveux</p>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
                 <a href="/ecommerce/products/index.php" class="btn-checkout" style="display:inline-block;width:auto;padding:14px 35px;">
-                    🛍️ Voir nos produits
+                     Voir nos produits
                 </a>
                 <a href="/ecommerce/coiffures.php" style="background:#F5E6D3;color:#3E1F0D;border-radius:12px;padding:14px 35px;font-weight:700;text-decoration:none;display:inline-block;">
-                    💇‍♀️ Inspirations coiffures
+                     Inspirations coiffures
                 </a>
             </div>
         </div>

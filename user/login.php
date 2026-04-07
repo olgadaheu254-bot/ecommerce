@@ -10,25 +10,30 @@ if(isset($_SESSION['user_id'])) {
 $error = '';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username']);
+    $email    = trim($_POST['email']);
     $password = $_POST['password'];
-    
-    if(empty($username) || empty($password)) {
+
+    if(empty($email) || empty($password)) {
         $error = "Tous les champs sont obligatoires.";
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-        $stmt->execute([$username, $username]);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
         $user = $stmt->fetch();
-        
+
         if($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id']   = $user['id'];
-            $_SESSION['username']  = $user['username'];
-            $_SESSION['role']      = $user['role'];
-            $_SESSION['first_name']= $user['first_name'];
-            $_SESSION['last_name'] = $user['last_name'];
-            
-            $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '/ecommerce/index.php';
-            header('Location: ' . $redirect);
+            $_SESSION['user_id']    = $user['id'];
+            $_SESSION['username']   = $user['username'];
+            $_SESSION['role']       = $user['role'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['last_name']  = $user['last_name'];
+
+            // ✅ CORRECTION : redirection différente selon le rôle
+            if($user['role'] === 'admin') {
+                header('Location: /ecommerce/admin/index.php'); // pour diriger les admins
+            } else {
+                $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '/ecommerce/index.php';
+                header('Location: ' . $redirect);
+            }
             exit;
         } else {
             $error = "Identifiants incorrects.";
@@ -195,14 +200,14 @@ include '../includes/header.php';
                         <!-- GAUCHE décorative -->
                         <div class="col-lg-5 d-none d-lg-block">
                             <div class="auth-left h-100">
-                                <div style="font-size:5rem;margin-bottom:20px;">🌿</div>
+                                <div style="font-size:5rem;margin-bottom:20px;"></div>
                                 <h2>Bon retour !</h2>
                                 <p>Connectez-vous pour accéder à votre espace personnel HairRoots et profiter de toutes nos offres.</p>
                                 <div class="mt-4">
-                                    <span class="auth-badge">🛍️ Vos commandes</span>
-                                    <span class="auth-badge">💇‍♀️ Vos RDV</span>
-                                    <span class="auth-badge">❤️ Vos favoris</span>
-                                    <span class="auth-badge">🎁 Vos offres</span>
+                                    <span class="auth-badge"> Vos commandes</span>
+                                    <span class="auth-badge"> Vos RDV</span>
+                                    <span class="auth-badge"> Vos favoris</span>
+                                    <span class="auth-badge"> Vos offres</span>
                                 </div>
                             </div>
                         </div>
@@ -210,29 +215,29 @@ include '../includes/header.php';
                         <!-- DROITE formulaire -->
                         <div class="col-lg-7">
                             <div class="auth-right">
-                                <h3 class="auth-title">🔐 Connexion</h3>
+                                <h3 class="auth-title"> Connexion</h3>
                                 <p class="auth-subtitle">Connectez-vous à votre compte HairRoots</p>
 
                                 <?php if($error): ?>
                                     <div class="alert-hairroots error">
-                                        ⚠️ <?= htmlspecialchars($error) ?>
+                                         <?= htmlspecialchars($error) ?>
                                     </div>
                                 <?php endif; ?>
 
                                 <?php if(isset($_GET['registered'])): ?>
                                     <div class="alert-hairroots success">
-                                        ✅ Inscription réussie ! Vous pouvez maintenant vous connecter.
+                                         Inscription réussie ! Vous pouvez maintenant vous connecter.
                                     </div>
                                 <?php endif; ?>
 
                                 <form method="POST" action="">
                                     <div class="auth-input-group">
-                                        <label>Nom d'utilisateur ou Email</label>
-                                        <i class="bi bi-person input-icon"></i>
-                                        <input type="text" class="auth-input" name="username"
-                                               value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>"
-                                               placeholder="Votre identifiant ou email"
-                                               required autofocus>
+                                        <label>Email</label>
+                                        <i class="bi bi-envelope input-icon"></i>
+                                        <input type="email" class="auth-input" name="email"
+                                            value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
+                                            placeholder="Votre adresse email"
+                                            required autofocus>
                                     </div>
 
                                     <div class="auth-input-group">
@@ -255,7 +260,7 @@ include '../includes/header.php';
                                     </div>
 
                                     <button type="submit" class="btn-auth">
-                                        🔑 Se connecter
+                                         Se connecter
                                     </button>
                                 </form>
 

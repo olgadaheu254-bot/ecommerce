@@ -70,9 +70,10 @@ include 'includes/header.php';
 .rdv-section{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#3E1F0D;margin:25px 0 15px;padding-bottom:8px;border-bottom:2px solid #F5E6D3;display:flex;align-items:center;gap:8px}
 
 /* COIFFEUSES */
-.coiffeuse-card{border:2px solid #F5E6D3;border-radius:16px;padding:15px;cursor:pointer;transition:all 0.3s;background:#FDFAF7;text-align:center}
+.coiffeuse-radio{display:none}
+.coiffeuse-card{border:2px solid #F5E6D3;border-radius:16px;padding:15px;cursor:pointer;transition:all 0.3s;background:#FDFAF7;text-align:center;display:block;margin:0;user-select:none}
 .coiffeuse-card:hover{border-color:#C9A84C;transform:translateY(-3px);box-shadow:0 8px 20px rgba(201,168,76,0.15)}
-.coiffeuse-card.selected{border-color:#C9A84C;background:linear-gradient(135deg,#FFFDF5,#FFF8E8);box-shadow:0 8px 20px rgba(201,168,76,0.2)}
+.coiffeuse-radio:checked + .coiffeuse-card{border-color:#C9A84C;background:linear-gradient(135deg,#FFFDF5,#FFF8E8);box-shadow:0 8px 20px rgba(201,168,76,0.2)}
 .coiffeuse-card img{width:70px;height:70px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F5E6D3;margin-bottom:8px}
 .coiffeuse-card .c-init{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#C1622F);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:#fff;margin:0 auto 8px;font-family:'Playfair Display',serif}
 .coiffeuse-card .c-name{font-weight:700;color:#3E1F0D;font-size:0.88rem}
@@ -112,7 +113,7 @@ include 'includes/header.php';
 <div class="container">
 
 <div class="rdv-hero">
-    <h1>📅 Prendre Rendez-vous</h1>
+    <h1> Prendre Rendez-vous</h1>
     <p>Reservez votre seance avec l'une de nos coiffeuses expertes</p>
 </div>
 
@@ -121,15 +122,15 @@ include 'includes/header.php';
 <div class="rdv-card" style="max-width:600px;margin:0 auto">
     <div class="rdv-card-body">
         <div class="success-box">
-            <div class="success-icon">✅</div>
+            <div class="success-icon"></div>
             <h2 style="font-family:'Playfair Display',serif;color:#3E1F0D;font-size:2rem">Rendez-vous confirme !</h2>
             <p style="color:#6B3A2A;font-size:1rem;margin:10px 0 25px">Votre reservation a bien ete enregistree. Nous vous contacterons pour confirmer votre creneau.</p>
             <div style="background:linear-gradient(135deg,#F5E6D3,#FDEBD0);border-radius:14px;padding:20px;margin-bottom:25px;text-align:left">
                 <p style="color:#9a7c5c;font-size:0.82rem;margin:0 0 3px;font-weight:600">RECAPITULATIF</p>
                 <p style="color:#3E1F0D;font-weight:700;margin:5px 0">👤 <?= htmlspecialchars($_POST['prenom_client'].' '.$_POST['nom_client']) ?></p>
-                <p style="color:#6B3A2A;margin:5px 0">📅 <?= date('d/m/Y', strtotime($_POST['date_rdv'])) ?> a <?= htmlspecialchars($_POST['heure_rdv']) ?></p>
-                <p style="color:#6B3A2A;margin:5px 0">✂️ <?= htmlspecialchars($_POST['type_prestation']) ?></p>
-                <p style="color:#6B3A2A;margin:5px 0">🌀 Cheveux <?= htmlspecialchars($_POST['type_cheveux']) ?></p>
+                <p style="color:#6B3A2A;margin:5px 0"><?= date('d/m/Y', strtotime($_POST['date_rdv'])) ?> a <?= htmlspecialchars($_POST['heure_rdv']) ?></p>
+                <p style="color:#6B3A2A;margin:5px 0"> <?= htmlspecialchars($_POST['type_prestation']) ?></p>
+                <p style="color:#6B3A2A;margin:5px 0"> Cheveux <?= htmlspecialchars($_POST['type_cheveux']) ?></p>
             </div>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
                 <a href="rendez-vous.php" style="background:linear-gradient(135deg,#C9A84C,#b8942e);color:#3E1F0D;padding:12px 30px;border-radius:12px;font-weight:700;text-decoration:none">Nouveau RDV</a>
@@ -155,12 +156,14 @@ include 'includes/header.php';
     <form method="POST" action="" id="rdv-form">
 
         <!-- CHOIX COIFFEUSE -->
-        <div class="rdv-section">✂️ Choisir votre coiffeuse</div>
+        <div class="rdv-section"> Choisir votre coiffeuse</div>
         <div class="row g-3 mb-3">
             <?php foreach($coiffeuses as $c): ?>
             <div class="col-md-4 col-6">
-                <div class="coiffeuse-card <?= (isset($_POST['coiffeuse_id'])&&$_POST['coiffeuse_id']==$c['id'])?'selected':'' ?>"
-                     data-id="<?= $c['id'] ?>" onclick="selectCoiffeuse(<?= $c['id'] ?>)">
+                <input type="radio" name="coiffeuse_choice" id="c<?= $c['id'] ?>" value="<?= $c['id'] ?>" class="coiffeuse-radio"
+                       <?= (isset($_POST['coiffeuse_id'])&&$_POST['coiffeuse_id']==$c['id'])||(count($coiffeuses)>0&&$c['id']==$coiffeuses[0]['id']&&!isset($_POST['coiffeuse_id']))?'checked':'' ?>
+                       onchange="document.getElementById('coiffeuse_id').value=this.value">
+                <label for="c<?= $c['id'] ?>" class="coiffeuse-card">
                     <?php if(!empty($c['photo'])): ?>
                         <img src="/ecommerce/<?= htmlspecialchars($c['photo']) ?>" alt="<?= htmlspecialchars($c['prenom']) ?>">
                     <?php else: ?>
@@ -168,14 +171,14 @@ include 'includes/header.php';
                     <?php endif; ?>
                     <div class="c-name"><?= htmlspecialchars($c['prenom'].' '.$c['nom']) ?></div>
                     <div class="c-spec"><?= htmlspecialchars($c['specialite']) ?></div>
-                </div>
+                </label>
             </div>
             <?php endforeach; ?>
         </div>
         <input type="hidden" name="coiffeuse_id" id="coiffeuse_id" value="<?= isset($_POST['coiffeuse_id'])?htmlspecialchars($_POST['coiffeuse_id']):(count($coiffeuses)>0?$coiffeuses[0]['id']:'') ?>">
 
         <!-- TYPE PRESTATION -->
-        <div class="rdv-section">💆‍♀️ Type de prestation</div>
+        <div class="rdv-section"> Type de prestation</div>
         <div class="d-flex flex-wrap gap-2 mb-3">
             <?php
             $prestations = ['Tresse','Box Braids','Wash and Go','Lissage','Coloration','Soin capillaire','Coupe','Balayage'];
@@ -187,10 +190,10 @@ include 'includes/header.php';
         <input type="hidden" name="type_prestation" id="type_prestation" value="<?= isset($_POST['type_prestation'])?htmlspecialchars($_POST['type_prestation']):'' ?>">
 
         <!-- TYPE CHEVEUX -->
-        <div class="rdv-section">🌀 Type de cheveux</div>
+        <div class="rdv-section"> Type de cheveux</div>
         <div class="d-flex flex-wrap gap-2 mb-3">
             <?php
-            $types = ['🌀 Boucles','✨ Crepus','💫 Lisses','🌊 Ondules','Mixtes'];
+            $types = [' Boucles',' Crepus',' Lisses',' Ondules','Mixtes'];
             foreach($types as $t): $sel = isset($_POST['type_cheveux'])&&$_POST['type_cheveux']==$t; ?>
             <button type="button" class="type-btn <?= $sel?'selected':'' ?>"
                     onclick="selectType(this, 'cheveux')"><?= $t ?></button>
@@ -199,7 +202,7 @@ include 'includes/header.php';
         <input type="hidden" name="type_cheveux" id="type_cheveux" value="<?= isset($_POST['type_cheveux'])?htmlspecialchars($_POST['type_cheveux']):'' ?>">
 
         <!-- DATE & HEURE -->
-        <div class="rdv-section">📅 Date et heure</div>
+        <div class="rdv-section">Date et heure</div>
         <div class="row g-3 mb-3">
             <div class="col-md-6">
                 <label class="rdv-label">Date *</label>
@@ -257,7 +260,7 @@ include 'includes/header.php';
         </div>
 
         <div class="mt-4">
-            <button type="submit" class="btn-rdv">📅 Confirmer mon rendez-vous</button>
+            <button type="submit" class="btn-rdv">Confirmer mon rendez-vous</button>
         </div>
 
     </form>
@@ -268,21 +271,21 @@ include 'includes/header.php';
 <!-- SIDEBAR -->
 <div class="col-lg-4">
     <div class="rdv-info-card">
-        <h5 style="font-family:'Playfair Display',serif;color:#3E1F0D;margin-bottom:20px">ℹ️ Informations utiles</h5>
+        <h5 style="font-family:'Playfair Display',serif;color:#3E1F0D;margin-bottom:20px">ℹInformations utiles</h5>
         <div class="rdv-info-item">
-            <div class="rdv-info-icon">🕐</div>
+            <div class="rdv-info-icon"></div>
             <div><strong style="color:#3E1F0D;font-size:0.88rem">Horaires</strong><br><span style="color:#6B3A2A;font-size:0.82rem">Lun-Sam : 9h00 - 18h00<br>Dimanche : Ferme</span></div>
         </div>
         <div class="rdv-info-item">
-            <div class="rdv-info-icon">📍</div>
+            <div class="rdv-info-icon"></div>
             <div><strong style="color:#3E1F0D;font-size:0.88rem">Adresse</strong><br><span style="color:#6B3A2A;font-size:0.82rem">123 Rue des Cheveux<br>75001 Paris</span></div>
         </div>
         <div class="rdv-info-item">
-            <div class="rdv-info-icon">📞</div>
+            <div class="rdv-info-icon"></div>
             <div><strong style="color:#3E1F0D;font-size:0.88rem">Contact</strong><br><span style="color:#6B3A2A;font-size:0.82rem">01 23 45 67 89<br>contact@hairroots.fr</span></div>
         </div>
         <div class="rdv-info-item">
-            <div class="rdv-info-icon">⚠️</div>
+            <div class="rdv-info-icon"></div>
             <div><strong style="color:#3E1F0D;font-size:0.88rem">Annulation</strong><br><span style="color:#6B3A2A;font-size:0.82rem">Annulation gratuite jusqu'a 24h avant le RDV</span></div>
         </div>
     </div>
@@ -290,7 +293,7 @@ include 'includes/header.php';
     <!-- COIFFEUSES -->
     <?php if(count($coiffeuses)>0): ?>
     <div class="rdv-info-card">
-        <h5 style="font-family:'Playfair Display',serif;color:#3E1F0D;margin-bottom:15px">💼 Nos expertes</h5>
+        <h5 style="font-family:'Playfair Display',serif;color:#3E1F0D;margin-bottom:15px">Nos expertes</h5>
         <?php foreach($coiffeuses as $c): ?>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #F5E6D3">
             <?php if(!empty($c['photo'])): ?>
@@ -313,11 +316,7 @@ include 'includes/header.php';
 </div></div>
 
 <script>
-function selectCoiffeuse(id) {
-    document.querySelectorAll('.coiffeuse-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelector('[data-id="'+id+'"]').classList.add('selected');
-    document.getElementById('coiffeuse_id').value = id;
-}
+// Selection coiffeuse via radio buttons natifs
 function selectType(el, group) {
     el.closest('.d-flex').querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
     el.classList.add('selected');
@@ -341,10 +340,6 @@ function loadHoraires() {
         document.querySelectorAll('.heure-btn').forEach(b=>b.classList.remove('taken'));
     }
 }
-// Selectionner premiere coiffeuse par defaut
-document.addEventListener('DOMContentLoaded', function() {
-    const first = document.querySelector('.coiffeuse-card');
-    if(first && !document.querySelector('.coiffeuse-card.selected')) first.classList.add('selected');
-});
+// La premiere coiffeuse est selectionnee par defaut via l'attribut checked
 </script>
 <?php include 'includes/footer.php'; ?>

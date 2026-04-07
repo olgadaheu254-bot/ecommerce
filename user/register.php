@@ -12,26 +12,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'];
     $first_name       = trim($_POST['first_name']);
     $last_name        = trim($_POST['last_name']);
-    
-    if(empty($username) || empty($email) || empty($password) || empty($first_name) || empty($last_name)) {
+    $address          = trim($_POST['address']);
+    $city             = trim($_POST['city']);
+    $postal_code      = trim($_POST['postal_code']);
+
+    if(empty($username) || empty($email) || empty($password) || empty($first_name) || empty($last_name) || empty($address) || empty($city) || empty($postal_code)) {
         $error = "Tous les champs sont obligatoires.";
     } elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Adresse email invalide.";
-    } elseif(strlen($password) < 6) {
-        $error = "Le mot de passe doit contenir au moins 6 caractères.";
+    } elseif(strlen($password) < 8) {
+        $error = "Le mot de passe doit contenir au moins 8 caractères.";
+    } elseif(!preg_match('/[A-Z]/', $password)) {
+        $error = "Le mot de passe doit contenir au moins une lettre majuscule.";
+    } elseif(!preg_match('/[0-9]/', $password)) {
+        $error = "Le mot de passe doit contenir au moins un chiffre.";
+    } elseif(!preg_match('/[\W_]/', $password)) {
+        $error = "Le mot de passe doit contenir au moins un caractère spécial (!@#$%...).";
     } elseif($password !== $confirm_password) {
         $error = "Les mots de passe ne correspondent pas.";
     } else {
         $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
         $stmt->execute([$username, $email]);
-        
+
         if($stmt->fetch()) {
             $error = "Ce nom d'utilisateur ou email est déjà utilisé.";
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)");
-            
-            if($stmt->execute([$username, $email, $hashed_password, $first_name, $last_name])) {
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, first_name, last_name, address, city, postal_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+            if($stmt->execute([$username, $email, $hashed_password, $first_name, $last_name, $address, $city, $postal_code])) {
                 $success = "Inscription réussie ! Redirection en cours...";
                 header("refresh:2;url=login.php?registered=1");
             } else {
@@ -187,11 +196,34 @@ include '../includes/header.php';
     color: #2e7d32;
     border-left: 4px solid #2e7d32;
 }
-.password-hint {
-    font-size: 0.78rem;
-    color: #9a7c5c;
-    margin-top: 4px;
+.password-hint { font-size: 0.78rem; color: #9a7c5c; margin-top: 4px; }
+
+/* Indicateur force mot de passe */
+.password-strength { margin-top: 8px; }
+.strength-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: #F5E6D3;
+    margin-bottom: 6px;
+    overflow: hidden;
 }
+.strength-fill {
+    height: 100%;
+    border-radius: 4px;
+    width: 0%;
+    transition: all 0.4s;
+}
+.strength-text { font-size: 0.75rem; font-weight: 600; }
+.criteria-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.criteria-list li {
+    font-size: 0.75rem;
+    color: #c62828;
+    margin-bottom: 2px;
+    transition: color 0.3s;
+}
+.criteria-list li.valid { color: #2e7d32; }
+.criteria-list li::before { content: '✗ '; }
+.criteria-list li.valid::before { content: '✓ '; }
 </style>
 
 <div class="auth-page">
@@ -204,17 +236,17 @@ include '../includes/header.php';
                         <!-- GAUCHE décorative -->
                         <div class="col-lg-4 d-none d-lg-block">
                             <div class="auth-left h-100">
-                                <div style="font-size:5rem;margin-bottom:20px;">✨</div>
+                                <div style="font-size:5rem;margin-bottom:20px;"></div>
                                 <h2>Rejoignez HairRoots !</h2>
                                 <p>Créez votre compte et profitez d'une expérience capillaire unique, adaptée à vos cheveux.</p>
                                 <div class="mt-4">
-                                    <span class="auth-badge">🌀 Bouclés</span>
-                                    <span class="auth-badge">✨ Crépus</span>
-                                    <span class="auth-badge">💫 Lisses</span>
-                                    <span class="auth-badge">🌊 Ondulés</span>
-                                    <span class="auth-badge">👩 Femmes</span>
-                                    <span class="auth-badge">👨 Hommes</span>
-                                    <span class="auth-badge">🧒 Enfants</span>
+                                    <span class="auth-badge"> Bouclés</span>
+                                    <span class="auth-badge"> Crépus</span>
+                                    <span class="auth-badge"> Lisses</span>
+                                    <span class="auth-badge"> Ondulés</span>
+                                    <span class="auth-badge"> Femmes</span>
+                                    <span class="auth-badge"> Hommes</span>
+                                    <span class="auth-badge"> Enfants</span>
                                 </div>
                             </div>
                         </div>
@@ -227,13 +259,13 @@ include '../includes/header.php';
 
                                 <?php if($error): ?>
                                     <div class="alert-hairroots error">
-                                        ⚠️ <?= htmlspecialchars($error) ?>
+                                        <?= htmlspecialchars($error) ?>
                                     </div>
                                 <?php endif; ?>
 
                                 <?php if($success): ?>
                                     <div class="alert-hairroots success">
-                                        ✅ <?= htmlspecialchars($success) ?>
+                                        <?= htmlspecialchars($success) ?>
                                     </div>
                                 <?php endif; ?>
 
@@ -243,7 +275,7 @@ include '../includes/header.php';
                                     <div class="row g-3 mb-0">
                                         <div class="col-md-6">
                                             <div class="auth-input-group">
-                                                <label>👤 Prénom</label>
+                                                <label>Prénom</label>
                                                 <input type="text" class="auth-input-no-icon" name="first_name"
                                                        value="<?= isset($_POST['first_name']) ? htmlspecialchars($_POST['first_name']) : '' ?>"
                                                        placeholder="Votre prénom" required>
@@ -251,7 +283,7 @@ include '../includes/header.php';
                                         </div>
                                         <div class="col-md-6">
                                             <div class="auth-input-group">
-                                                <label>👤 Nom</label>
+                                                <label>Nom</label>
                                                 <input type="text" class="auth-input-no-icon" name="last_name"
                                                        value="<?= isset($_POST['last_name']) ? htmlspecialchars($_POST['last_name']) : '' ?>"
                                                        placeholder="Votre nom" required>
@@ -261,16 +293,45 @@ include '../includes/header.php';
 
                                     <!-- Username -->
                                     <div class="auth-input-group">
-                                        <label>🏷️ Nom d'utilisateur</label>
+                                        <label>Nom d'utilisateur</label>
                                         <i class="bi bi-person input-icon"></i>
                                         <input type="text" class="auth-input" name="username"
                                                value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>"
                                                placeholder="Choisissez un pseudo unique" required>
                                     </div>
 
+                                    <!-- Adresse -->
+                                    <div class="auth-input-group">
+                                        <label>Adresse</label>
+                                        <i class="bi bi-geo-alt input-icon"></i>
+                                        <input type="text" class="auth-input" name="address"
+                                               value="<?= isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '' ?>"
+                                               placeholder="Votre adresse complète" required>
+                                    </div>
+
+                                    <!-- Ville & Code postal -->
+                                    <div class="row g-3 mb-0">
+                                        <div class="col-md-8">
+                                            <div class="auth-input-group">
+                                                <label>Ville</label>
+                                                <input type="text" class="auth-input-no-icon" name="city"
+                                                       value="<?= isset($_POST['city']) ? htmlspecialchars($_POST['city']) : '' ?>"
+                                                       placeholder="Votre ville" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="auth-input-group">
+                                                <label>Code postal</label>
+                                                <input type="text" class="auth-input-no-icon" name="postal_code"
+                                                       value="<?= isset($_POST['postal_code']) ? htmlspecialchars($_POST['postal_code']) : '' ?>"
+                                                       placeholder="75000" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Email -->
                                     <div class="auth-input-group">
-                                        <label>📧 Adresse email</label>
+                                        <label>Adresse email</label>
                                         <i class="bi bi-envelope input-icon"></i>
                                         <input type="email" class="auth-input" name="email"
                                                value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
@@ -281,19 +342,34 @@ include '../includes/header.php';
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="auth-input-group">
-                                                <label>🔒 Mot de passe</label>
+                                                <label>Mot de passe</label>
                                                 <i class="bi bi-lock input-icon"></i>
                                                 <input type="password" class="auth-input" name="password"
-                                                       placeholder="Min. 6 caractères" required>
-                                                <p class="password-hint">Au moins 6 caractères</p>
+                                                       id="password"
+                                                       placeholder="Min. 8 caractères" required>
+                                                <!-- Indicateur visuel -->
+                                                <div class="password-strength">
+                                                    <div class="strength-bar">
+                                                        <div class="strength-fill" id="strengthFill"></div>
+                                                    </div>
+                                                    <span class="strength-text" id="strengthText"></span>
+                                                    <ul class="criteria-list" id="criteriaList">
+                                                        <li id="c-length">Au moins 8 caractères</li>
+                                                        <li id="c-upper">Une lettre majuscule</li>
+                                                        <li id="c-number">Un chiffre</li>
+                                                        <li id="c-special">Un caractère spécial (!@#$%...)</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="auth-input-group">
-                                                <label>🔒 Confirmer</label>
+                                                <label>Confirmer le mot de passe</label>
                                                 <i class="bi bi-lock-fill input-icon"></i>
                                                 <input type="password" class="auth-input" name="confirm_password"
+                                                       id="confirm_password"
                                                        placeholder="Répétez le mot de passe" required>
+                                                <p class="password-hint" id="matchHint"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -308,7 +384,7 @@ include '../includes/header.php';
                                     </div>
 
                                     <button type="submit" class="btn-auth">
-                                        🌿 Créer mon compte HairRoots
+                                        Créer mon compte HairRoots
                                     </button>
                                 </form>
 
@@ -318,12 +394,62 @@ include '../includes/header.php';
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+const pwd = document.getElementById('password');
+const confirmPwd = document.getElementById('confirm_password');
+const fill = document.getElementById('strengthFill');
+const text = document.getElementById('strengthText');
+const matchHint = document.getElementById('matchHint');
+
+pwd.addEventListener('input', function() {
+    const val = this.value;
+    let score = 0;
+
+    const cLength  = val.length >= 8;
+    const cUpper   = /[A-Z]/.test(val);
+    const cNumber  = /[0-9]/.test(val);
+    const cSpecial = /[\W_]/.test(val);
+
+    document.getElementById('c-length').classList.toggle('valid', cLength);
+    document.getElementById('c-upper').classList.toggle('valid', cUpper);
+    document.getElementById('c-number').classList.toggle('valid', cNumber);
+    document.getElementById('c-special').classList.toggle('valid', cSpecial);
+
+    if (cLength)  score++;
+    if (cUpper)   score++;
+    if (cNumber)  score++;
+    if (cSpecial) score++;
+
+    const levels = [
+        { w: '0%',   color: '#F5E6D3', label: '' },
+        { w: '25%',  color: '#c62828', label: 'Très faible' },
+        { w: '50%',  color: '#e65100', label: 'Faible' },
+        { w: '75%',  color: '#C9A84C', label: 'Moyen' },
+        { w: '100%', color: '#2e7d32', label: 'Fort' },
+    ];
+
+    fill.style.width = levels[score].w;
+    fill.style.background = levels[score].color;
+    text.textContent = levels[score].label;
+    text.style.color = levels[score].color;
+});
+
+confirmPwd.addEventListener('input', function() {
+    if (this.value === pwd.value) {
+        matchHint.textContent = ' Les mots de passe correspondent';
+        matchHint.style.color = '#2e7d32';
+    } else {
+        matchHint.textContent = ' Les mots de passe ne correspondent pas';
+        matchHint.style.color = '#c62828';
+    }
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>

@@ -81,7 +81,7 @@ include 'includes/header.php';
 
     <!-- HERO -->
     <div class="page-hero">
-        <h1>💇‍♀️ Inspirations Coiffures</h1>
+        <h1> Inspirations Coiffures</h1>
         <div class="gold-line"></div>
         <p>Trouvez le style parfait pour vos cheveux parmi nos modeles tendance</p>
     </div>
@@ -90,7 +90,7 @@ include 'includes/header.php';
     <?php if(!$filtre_type && !$filtre_genre && !$filtre_diff && count($tendances) > 0): ?>
     <div class="tendances-section">
         <h2 style="font-family:'Playfair Display',serif;color:#3E1F0D;font-size:1.6rem;font-weight:700;margin-bottom:20px">
-            🔥 Tendances du moment
+             Tendances du moment
         </h2>
         <div class="row g-3">
             <?php foreach($tendances as $i => $t): ?>
@@ -100,10 +100,10 @@ include 'includes/header.php';
                         <img src="<?= htmlspecialchars($t['photo']) ?>" alt="<?= htmlspecialchars($t['nom']) ?>">
                     <?php else: ?>
                         <div class="t-img-ph" style="height:100%">
-                            <?php $icons=['Bouclés'=>'🌀','Crépus'=>'✨','Lisses'=>'💫','Ondulés'=>'🌊']; echo $icons[$t['type_cheveux']]??'💇'; ?>
+                            <?php $icons=['Bouclés'=>'','Crépus'=>'','Lisses'=>'','Ondulés'=>'']; echo $icons[$t['type_cheveux']]??''; ?>
                         </div>
                     <?php endif; ?>
-                    <span class="tendance-badge">🔥 Tendance</span>
+                    <span class="tendance-badge">Tendance</span>
                     <div class="tendance-overlay">
                         <h5 style="color:#fff;font-family:'Playfair Display',serif;font-weight:700;margin-bottom:5px"><?= htmlspecialchars($t['nom']) ?></h5>
                         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -124,7 +124,7 @@ include 'includes/header.php';
 
         <!-- Type cheveux -->
         <a href="coiffures.php" class="filter-btn <?= !$filtre_type?'active':'' ?>">Tous</a>
-        <?php foreach(['Bouclés'=>'🌀','Crépus'=>'✨','Lisses'=>'💫','Ondulés'=>'🌊'] as $type=>$icon): ?>
+        <?php foreach(['Bouclés'=>'','Crépus'=>'','Lisses'=>'','Ondulés'=>''] as $type=>$icon): ?>
         <a href="?type=<?= urlencode($type) ?><?= $filtre_genre?'&genre='.urlencode($filtre_genre):'' ?><?= $filtre_diff?'&diff='.urlencode($filtre_diff):'' ?>"
            class="filter-btn <?= $filtre_type===$type?'active':'' ?>"><?= $icon.' '.$type ?></a>
         <?php endforeach; ?>
@@ -132,7 +132,7 @@ include 'includes/header.php';
         <div class="filter-sep"></div>
 
         <!-- Genre -->
-        <?php foreach(['Femme'=>'👩','Homme'=>'👨','Enfant'=>'🧒','Mixte'=>'🌍'] as $genre=>$icon): ?>
+        <?php foreach(['Femme'=>'','Homme'=>'','Enfant'=>'','Mixte'=>''] as $genre=>$icon): ?>
         <a href="?<?= $filtre_type?'type='.urlencode($filtre_type).'&':'' ?>genre=<?= urlencode($genre) ?><?= $filtre_diff?'&diff='.urlencode($filtre_diff):'' ?>"
            class="filter-btn <?= $filtre_genre===$genre?'active':'' ?>"><?= $icon.' '.$genre ?></a>
         <?php endforeach; ?>
@@ -140,7 +140,7 @@ include 'includes/header.php';
         <div class="filter-sep"></div>
 
         <!-- Difficulte -->
-        <?php foreach(['Facile'=>'🟢','Moyen'=>'🟡','Difficile'=>'🔴'] as $diff=>$icon): ?>
+        <?php foreach(['Facile'=>'','Moyen'=>'','Difficile'=>''] as $diff=>$icon): ?>
         <a href="?<?= $filtre_type?'type='.urlencode($filtre_type).'&':'' ?><?= $filtre_genre?'genre='.urlencode($filtre_genre).'&':'' ?>diff=<?= urlencode($diff) ?>"
            class="filter-btn <?= $filtre_diff===$diff?'active':'' ?>"><?= $icon.' '.$diff ?></a>
         <?php endforeach; ?>
@@ -172,7 +172,7 @@ include 'includes/header.php';
                         <img src="<?= htmlspecialchars($m['photo']) ?>" alt="<?= htmlspecialchars($m['nom']) ?>">
                     <?php else: ?>
                         <div class="modele-img-ph">
-                            <?php $icons=['Bouclés'=>'🌀','Crépus'=>'✨','Lisses'=>'💫','Ondulés'=>'🌊']; echo $icons[$m['type_cheveux']]??'💇'; ?>
+                            <?php $icons=['Bouclés'=>'','Crépus'=>'','Lisses'=>'','Ondulés'=>'']; echo $icons[$m['type_cheveux']]??''; ?>
                         </div>
                     <?php endif; ?>
                     <?php if($m['tendance']): ?>
@@ -194,7 +194,7 @@ include 'includes/header.php';
                         <span class="modele-duree">⏱ <?= htmlspecialchars($m['duree_realisation']) ?></span>
                     </div>
                     <a href="rendez-vous.php?prestation=<?= urlencode($m['nom']) ?>" class="btn-rdv-inspi">
-                        📅 Reserver ce style
+                        Reserver ce style
                     </a>
                 </div>
             </div>
@@ -204,7 +204,7 @@ include 'includes/header.php';
 
     <?php else: ?>
     <div class="empty-inspi">
-        <div style="font-size:4rem;margin-bottom:15px">💇‍♀️</div>
+        <div style="font-size:4rem;margin-bottom:15px"></div>
         <h4 style="color:#3E1F0D">Aucun modele trouve</h4>
         <p style="color:#9a7c5c">Essayez d'autres filtres</p>
         <a href="coiffures.php" style="background:linear-gradient(135deg,#C9A84C,#b8942e);color:#3E1F0D;padding:12px 30px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-block;margin-top:15px">Voir tous les modeles</a>
