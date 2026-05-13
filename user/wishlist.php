@@ -78,7 +78,7 @@ include '../includes/header.php';
             <div class="wish-card">
                 <div class="wish-img-wrap">
                     <?php if(!empty($p['image'])): ?>
-                        <img src="<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
+                        <img src="/ecommerce/<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
                     <?php else: ?>
                         <div class="wish-img-ph"></div>
                     <?php endif; ?>

@@ -11,11 +11,17 @@
 </head>
 <body>
 
+<?php
+// On n'affiche la navbar publique que si on n'est PAS dans l'admin
+$is_admin = strpos($_SERVER['REQUEST_URI'], '/admin/') !== false;
+if(!$is_admin):
+?>
+
     <!-- TOP BAR -->
     <div class="topbar">
         <div class="container d-flex justify-content-between align-items-center py-1">
-            <span class="small"> Livraison partout en France sous 48h</span>
-            <span class="small"> Support 7j/7 | ✉️ contact@hairroots.fr</span>
+            <span class="small">Livraison partout en France sous 48h</span>
+            <span class="small">Support 7j/7 | contact@hairroots.fr</span>
         </div>
     </div>
 
@@ -31,7 +37,7 @@
                         .lh { fill: #F5D78A; }
                         .lr { fill: #F5D78A; }
                         .dm { fill: #C9A84C; }
-                        .sl { stroke: #C9A84C; fill: none; } 
+                        .sl { stroke: #C9A84C; fill: none; }
                     </style>
                     <circle cx="100" cy="100" r="88" class="nr" stroke-width="1.5"/>
                     <circle cx="100" cy="100" r="80" stroke="#8B6914" fill="none" stroke-width="0.8"/>
@@ -79,48 +85,46 @@
                         </a>
                     </li>
 
-                    <!-- Femmes -->
+                    <!-- Produits -->
                     <li class="nav-item dropdown">
                         <a class="nav-link hairroots-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-dress"></i> Femmes
+                            <i class="bi bi-bag-fill"></i> Produits
                         </a>
                         <ul class="dropdown-menu hairroots-dropdown">
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=femme&sub=soins">
-                                <i class="bi bi-droplet-fill me-2"></i> Soins de cheveux</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?type=femme">
-                                <i class="bi bi-scissors me-2"></i> Coiffure</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=femme&sub=meches">
-                                <i class="bi bi-bag-fill me-2"></i> Achat des mèches</a></li>
+                            <li><h6 class="dropdown-header">Meches</h6></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?category=1">
+                                <i class="bi bi-circle-fill me-2" style="font-size:0.5rem"></i> Meches Bouclees</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?category=2">
+                                <i class="bi bi-circle-fill me-2" style="font-size:0.5rem"></i> Meches Crepues</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?category=3">
+                                <i class="bi bi-circle-fill me-2" style="font-size:0.5rem"></i> Meches Lisses</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?category=4">
+                                <i class="bi bi-circle-fill me-2" style="font-size:0.5rem"></i> Meches Ondulees</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Soins</h6></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?category=5">
+                                <i class="bi bi-droplet-fill me-2"></i> Soins Cheveux</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/ecommerce/products/index.php">
+                                <i class="bi bi-grid me-2"></i> Tous les produits</a></li>
                         </ul>
                     </li>
 
-                    <!-- Hommes -->
+                    <!-- Inspirations -->
                     <li class="nav-item dropdown">
                         <a class="nav-link hairroots-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-fill"></i> Hommes
+                            <i class="bi bi-scissors"></i> Inspirations
                         </a>
                         <ul class="dropdown-menu hairroots-dropdown">
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=homme&sub=soins">
-                                <i class="bi bi-droplet-fill me-2"></i> Soins de cheveux</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?type=homme">
-                                <i class="bi bi-scissors me-2"></i> Coiffure</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=homme&sub=meches">
-                                <i class="bi bi-bag-fill me-2"></i> Achat des mèches</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- Enfants -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link hairroots-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-stars"></i> Enfants
-                        </a>
-                        <ul class="dropdown-menu hairroots-dropdown">
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=enfant&sub=soins">
-                                <i class="bi bi-droplet-fill me-2"></i> Soins de cheveux</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?type=enfant">
-                                <i class="bi bi-scissors me-2"></i> Coiffure</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/products/index.php?type=enfant&sub=meches">
-                                <i class="bi bi-bag-fill me-2"></i> Achat des mèches</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?genre=Femme">
+                                <i class="bi bi-person-dress me-2"></i> Femmes</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?genre=Homme">
+                                <i class="bi bi-person-fill me-2"></i> Hommes</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php?genre=Enfant">
+                                <i class="bi bi-stars me-2"></i> Enfants</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/ecommerce/coiffures.php">
+                                <i class="bi bi-grid me-2"></i> Toutes les inspirations</a></li>
                         </ul>
                     </li>
 
@@ -145,9 +149,25 @@
                     <a href="#" class="nav-icon" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <i class="bi bi-search"></i>
                     </a>
-                    <a href="/ecommerce/user/wishlist.php" class="nav-icon">
-                        <i class="bi bi-heart"></i>
-                    </a>
+                <div class="dropdown">
+                <a href="#" class="nav-icon" data-bs-toggle="dropdown">
+                    <i class="bi bi-heart"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end hairroots-dropdown">
+                    <li>
+                        <a class="dropdown-item" href="/ecommerce/user/wishlist.php">
+                            <i class="bi bi-bag-heart me-2" style="color:#C9A84C;"></i>
+                            Mes produits favoris
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/ecommerce/user/wishlist_inspirations.php">
+                            <i class="bi bi-stars me-2" style="color:#C1622F;"></i>
+                            Mes inspirations favorites
+                        </a>
+                    </li>
+                </ul>
+                </div>
                     <a href="/ecommerce/cart/index.php" class="nav-icon position-relative">
                         <i class="bi bi-bag"></i>
                         <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
@@ -160,10 +180,10 @@
                                 <i class="bi bi-person-circle"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end hairroots-dropdown">
-                                <li><span class="dropdown-item-text fw-bold text-brown"> <?php echo $_SESSION['first_name']; ?></span></li>
+                                <li><span class="dropdown-item-text fw-bold text-brown"><?php echo $_SESSION['first_name']; ?></span></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/ecommerce/user/profile.php"><i class="bi bi-person"></i> Mon Profil</a></li>
-                                <li><a class="dropdown-item" href="/ecommerce/user/logout.php"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
+                                <li><a class="dropdown-item" href="/ecommerce/user/logout.php"><i class="bi bi-box-arrow-right"></i> Deconnexion</a></li>
                             </ul>
                         </div>
                     <?php else: ?>
@@ -184,23 +204,25 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 rounded-4">
                 <div class="modal-body p-4">
-                    <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:#3E1F0D;"> Rechercher un produit</h5>
+                    <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:#3E1F0D;">Rechercher un produit</h5>
                     <form action="/ecommerce/products/index.php" method="GET">
                         <div class="input-group input-group-lg">
                             <input type="text" class="form-control border-0 bg-light" name="search"
-                                   placeholder="Mèches bouclées, shampoing, huile...">
+                                   placeholder="Meches bouclees, shampoing, huile...">
                             <button class="btn btn-gold px-4" type="submit">Rechercher</button>
                         </div>
                     </form>
                     <div class="mt-3">
                         <span class="text-muted small">Suggestions : </span>
-                        <a href="/ecommerce/products/index.php?category=1" class="badge bg-light text-dark text-decoration-none me-1"> Bouclés</a>
-                        <a href="/ecommerce/products/index.php?category=2" class="badge bg-light text-dark text-decoration-none me-1"> Crépus</a>
-                        <a href="/ecommerce/products/index.php?category=5" class="badge bg-light text-dark text-decoration-none me-1"> Soins</a>
+                        <a href="/ecommerce/products/index.php?category=1" class="badge bg-light text-dark text-decoration-none me-1">Meches Bouclees</a>
+                        <a href="/ecommerce/products/index.php?category=2" class="badge bg-light text-dark text-decoration-none me-1">Meches Crepues</a>
+                        <a href="/ecommerce/products/index.php?category=5" class="badge bg-light text-dark text-decoration-none me-1">Soins</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+     
+<?php endif; ?>
+<script src="/ecommerce/assets/js/script.js"></script>
 <main>

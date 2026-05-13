@@ -97,7 +97,7 @@ include '../includes/header.php';
                 <div class="cart-item" id="item-<?= $p['id'] ?>">
                     <!-- IMAGE -->
                     <?php if(!empty($p['image'])): ?>
-                        <img src="<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['name']) ?>" class="cart-item-img">
+                        <img src="/ecommerce/<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['name']) ?>" class="cart-item-img">
                     <?php else: ?>
                         <div class="cart-item-img-placeholder">🌿</div>
                     <?php endif; ?>

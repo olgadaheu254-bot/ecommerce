@@ -45,7 +45,7 @@ body {
 /* ---- LOGO ---- */
 .hairroots-brand {
     font-family: 'Playfair Display', serif;
-    font-size: 0 !important; /* cache le texte résiduel */
+    font-size: 0 !important;
     font-weight: 900;
     color: var(--dark-brown) !important;
     letter-spacing: 2px;
@@ -54,7 +54,7 @@ body {
     align-items: center;
     gap: 6px;
     line-height: 1;
-    width: fit-content; /* empêche le logo de s'étirer */
+    width: fit-content;
 }
 .hairroots-brand:hover {
     color: var(--dark-brown) !important;
@@ -248,6 +248,63 @@ body {
     outline: none;
 }
 
+/* ============================================
+   SCROLL HORIZONTAL
+   ============================================ */
+.scroll-horizontal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 20px;
+    padding: 10px 4px 20px 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    scrollbar-width: thin;
+    scrollbar-color: #C9A84C #F5E6D3;
+}
+.scroll-horizontal:active { cursor: grabbing; }
+.scroll-horizontal::-webkit-scrollbar { height: 4px; }
+.scroll-horizontal::-webkit-scrollbar-track { background: #F5E6D3; border-radius: 4px; }
+.scroll-horizontal::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 4px; }
+
+.scroll-horizontal .scroll-item {
+    flex: 0 0 260px;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
+    scroll-snap-align: start;
+}
+
+.scroll-horizontal .scroll-item .card,
+.scroll-horizontal .scroll-item .product-card-hr,
+.scroll-horizontal .scroll-item .modele-card,
+.scroll-horizontal .scroll-item .inspi-fav-card {
+    width: 100%;
+}
+
+.scroll-horizontal .scroll-item img {
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    border-radius: 12px 12px 0 0;
+}
+
+.scroll-horizontal .scroll-item .card,
+.scroll-horizontal .scroll-item .product-card-hr {
+    height: 100%;
+    overflow: hidden;
+}
+
+.scroll-horizontal .scroll-item > div {
+    overflow: hidden;
+    border-radius: 15px;
+}
+
 /* ---- PRODUCT CARDS ---- */
 .product-card-hr {
     background: #fff;
@@ -280,6 +337,7 @@ body {
     border-radius: 15px;
     font-size: 0.75rem;
     font-weight: 700;
+    z-index: 6;
 }
 .badge-stock-low {
     position: absolute; top: 10px; right: 10px;
@@ -289,8 +347,10 @@ body {
     border-radius: 15px;
     font-size: 0.72rem;
     font-weight: 600;
+    z-index: 6;
 }
 
+/* ---- OVERLAY ---- */
 .product-overlay {
     position: absolute;
     inset: 0;
@@ -300,8 +360,13 @@ body {
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s;
+    z-index: 5;
+    pointer-events: none;
 }
-.product-card-hr:hover .product-overlay { opacity: 1; }
+.product-card-hr:hover .product-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
 .overlay-btn {
     background: #fff;
     color: var(--dark-brown);
@@ -311,8 +376,46 @@ body {
     font-weight: 600;
     font-size: 0.9rem;
     transition: all 0.3s;
+    pointer-events: auto;
 }
 .overlay-btn:hover { background: var(--gold); color: var(--dark-brown); }
+
+/* ---- BOUTON FAVORI ---- */
+.btn-favori-bottom {
+    background: none;
+    border: none;
+    color: #9a7c5c;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 0 6px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s;
+    width: auto !important;
+}
+.btn-favori-bottom:hover { color: #c62828; }
+.btn-favori-bottom.active { color: #c62828; }
+
+/* ---- TOAST FAVORI ---- */
+.toast-prod {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #3E1F0D;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s;
+    border-left: 4px solid #C9A84C;
+}
+.toast-prod.show { opacity: 1; transform: translateY(0); }
 
 .product-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
 .product-category {
@@ -463,4 +566,10 @@ body {
     .type-filter-btn { padding: 6px 14px; font-size: 0.82rem; }
     .newsletter-box { padding: 25px; }
     .hairroots-brand { font-size: 0 !important; }
+    .scroll-horizontal .scroll-item {
+        flex: 0 0 220px;
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
+    }
 }

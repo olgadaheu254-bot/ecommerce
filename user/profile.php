@@ -268,7 +268,7 @@ include '../includes/header.php';
 <a href="?delete_address=<?= $a['id'] ?>" class="pbtn-danger" onclick="return confirm('Supprimer cette adresse ?')">Supprimer</a>
 </div></div>
 <?php endforeach; else: ?>
-<div class="text-center py-4"><div style="font-size:3rem">📍</div><p style="color:#9a7c5c;margin-top:10px">Pas encore d'adresse.</p></div>
+<div class="text-center py-4"><div style="font-size:3rem"></div><p style="color:#9a7c5c;margin-top:10px">Pas encore d'adresse.</p></div>
 <?php endif; ?>
 </div></div></div>
 
@@ -296,7 +296,7 @@ foreach($recent_orders as $o): $s=$sl[$o['status']]??['?','#F5E6D3','#6B3A2A']; 
 <a href="order-details.php?id=<?= $o['id'] ?>" style="background:#F5E6D3;color:#3E1F0D;padding:7px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;text-decoration:none">Voir</a>
 </div>
 <?php endforeach; else: ?>
-<div class="text-center py-5"><div style="font-size:3.5rem">🛍️</div><h6 style="color:#3E1F0D;margin-top:15px">Pas encore de commandes</h6>
+<div class="text-center py-5"><div style="font-size:3.5rem"></div><h6 style="color:#3E1F0D;margin-top:15px">Pas encore de commandes</h6>
 <a href="/ecommerce/products/index.php" class="pbtn" style="display:inline-block;margin-top:10px;text-decoration:none">Voir les produits</a></div>
 <?php endif; ?>
 </div></div></div>

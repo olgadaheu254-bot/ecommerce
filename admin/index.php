@@ -38,6 +38,12 @@ $stats_rdv = $pdo->query("SELECT
     SUM(CASE WHEN date_rdv = CURDATE() THEN 1 ELSE 0 END) as aujourd_hui
 FROM appointments")->fetch();
 
+// STATS COIFFEUSES
+$stats_coiffeuses = $pdo->query("SELECT
+    COUNT(*) as total,
+    SUM(CASE WHEN disponible = 1 THEN 1 ELSE 0 END) as disponibles
+FROM coiffeuses")->fetch();
+
 // DERNIERES COMMANDES
 $dernieres_commandes = $pdo->query("SELECT o.*, u.first_name, u.last_name FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC LIMIT 6")->fetchAll();
 
@@ -57,17 +63,6 @@ include 'header_admin.php';
 ?>
 <style>
 .admin-dash{background:#FDF8F2;min-height:80vh;padding:30px 0}
-
-/* HEADER */
-.dash-header{background:linear-gradient(135deg,#3E1F0D,#6B3A2A);border-radius:20px;padding:25px 30px;margin-bottom:30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
-.dash-header h1{font-family:'Playfair Display',serif;color:#C9A84C;font-size:1.8rem;font-weight:900;margin:0}
-.dash-header p{color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.88rem}
-.dash-nav{display:flex;gap:8px;flex-wrap:wrap}
-.dash-nav-btn{background:rgba(201,168,76,0.15);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;text-decoration:none;transition:all 0.3s}
-.dash-nav-btn:hover{background:#C9A84C;color:#3E1F0D}
-.dash-nav-btn.active{background:#C9A84C;color:#3E1F0D}
-
-/* STAT CARDS */
 .stat-card{background:#fff;border-radius:18px;padding:22px;box-shadow:0 4px 20px rgba(62,31,13,0.06);border:1px solid #F5E6D3;transition:all 0.3s;height:100%}
 .stat-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(62,31,13,0.1)}
 .stat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:15px}
@@ -76,46 +71,34 @@ include 'header_admin.php';
 .stat-sub{font-size:0.75rem;margin-top:8px;padding-top:8px;border-top:1px solid #F5E6D3}
 .stat-sub span{font-weight:700}
 .trend-up{color:#2e7d32}.trend-down{color:#c62828}.trend-neutral{color:#9a7c5c}
-
-/* SECTION CARDS */
 .dash-card{background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(62,31,13,0.06);border:1px solid #F5E6D3;overflow:hidden;margin-bottom:25px}
 .dash-card-header{background:linear-gradient(135deg,#F5E6D3,#FDEBD0);padding:16px 22px;border-bottom:1px solid #F0D9C0;display:flex;align-items:center;justify-content:space-between}
 .dash-card-header h5{font-family:'Playfair Display',serif;color:#3E1F0D;font-weight:700;margin:0;font-size:1rem}
 .dash-card-body{padding:20px}
 .dash-link{color:#C1622F;font-size:0.8rem;font-weight:600;text-decoration:none}
 .dash-link:hover{color:#3E1F0D}
-
-/* TABLEAU */
 .dash-table{width:100%;border-collapse:collapse}
 .dash-table th{padding:10px 12px;font-weight:700;font-size:0.78rem;color:#9a7c5c;text-align:left;border-bottom:1px solid #F5E6D3;text-transform:uppercase}
 .dash-table td{padding:12px;font-size:0.85rem;color:#3E1F0D;border-bottom:1px solid #F5E6D3;vertical-align:middle}
 .dash-table tr:last-child td{border-bottom:none}
 .dash-table tr:hover td{background:#FDFAF7}
-
-/* BADGES */
 .b{padding:3px 10px;border-radius:8px;font-size:0.72rem;font-weight:700;display:inline-block}
 .b-attente{background:#FFF8E1;color:#F57F17}
 .b-process{background:#E3F2FD;color:#1565C0}
 .b-shipped{background:#F3E5F5;color:#6A1B9A}
 .b-delivered{background:#E8F5E9;color:#2E7D32}
 .b-cancelled{background:#FCE4E4;color:#C62828}
-
-/* CHART BARS */
 .chart-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:120px;padding:10px 0}
 .chart-bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .chart-bar{background:linear-gradient(180deg,#C9A84C,#C1622F);border-radius:6px 6px 0 0;width:100%;min-height:4px;transition:all 0.5s}
 .chart-bar-label{font-size:0.68rem;color:#9a7c5c;text-align:center;white-space:nowrap}
 .chart-bar-val{font-size:0.7rem;font-weight:700;color:#3E1F0D}
-
-/* ACTIVITE RECENTE */
 .activity-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F5E6D3}
 .activity-item:last-child{border-bottom:none}
 .activity-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
 .activity-text{font-size:0.85rem;color:#3E1F0D;flex:1}
 .activity-time{font-size:0.75rem;color:#9a7c5c;white-space:nowrap}
-
-/* QUICK ACTIONS */
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:25px}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:25px}
 .qa-btn{background:#fff;border:2px solid #F5E6D3;border-radius:14px;padding:16px;text-align:center;text-decoration:none;transition:all 0.3s;display:block}
 .qa-btn:hover{border-color:#C9A84C;background:#FFFDF5;transform:translateY(-2px)}
 .qa-btn-icon{font-size:1.8rem;margin-bottom:6px}
@@ -124,26 +107,9 @@ include 'header_admin.php';
 
 <div class="admin-dash"><div class="container">
 
-<!-- HEADER -->
-<div class="dash-header">
-    <div>
-        <h1> Dashboard Admin</h1>
-        <p>Bonjour <?= htmlspecialchars($_SESSION['first_name']) ?> · <?= date('d/m/Y') ?></p>
-    </div>
-    <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn active"> Vue generale</a>
-        <a href="products.php" class="dash-nav-btn"> Produits</a>
-        <a href="orders.php" class="dash-nav-btn"> Commandes</a>
-        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
-    </div>
-</div>
-
 <!-- STATS PRINCIPALES -->
 <div class="row g-3 mb-4">
-
-    <!-- REVENU -->
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-2 col-md-4 col-6">
         <div class="stat-card">
             <div class="stat-icon" style="background:linear-gradient(135deg,#FFF8E1,#FDEBD0)"></div>
             <div class="stat-num"><?= number_format($stats_commandes['revenu_total']??0,0,'.',''.' ') ?>€</div>
@@ -154,9 +120,7 @@ include 'header_admin.php';
             </div>
         </div>
     </div>
-
-    <!-- COMMANDES -->
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-2 col-md-4 col-6">
         <div class="stat-card">
             <div class="stat-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)"></div>
             <div class="stat-num"><?= $stats_commandes['total']??0 ?></div>
@@ -167,9 +131,7 @@ include 'header_admin.php';
             </div>
         </div>
     </div>
-
-    <!-- UTILISATEURS -->
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-2 col-md-4 col-6">
         <div class="stat-card">
             <div class="stat-icon" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"></div>
             <div class="stat-num"><?= $stats_users['total']??0 ?></div>
@@ -180,9 +142,7 @@ include 'header_admin.php';
             </div>
         </div>
     </div>
-
-    <!-- RDV -->
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-2 col-md-4 col-6">
         <div class="stat-card">
             <div class="stat-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7)"></div>
             <div class="stat-num"><?= $stats_rdv['total']??0 ?></div>
@@ -193,19 +153,29 @@ include 'header_admin.php';
             </div>
         </div>
     </div>
+    <div class="col-lg-2 col-md-4 col-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#F5E6D3,#FDEBD0)"></div>
+            <div class="stat-num"><?= $stats_coiffeuses['total']??0 ?></div>
+            <div class="stat-label">Coiffeuses</div>
+            <div class="stat-sub">
+                Disponibles : <span class="trend-up"><?= $stats_coiffeuses['disponibles']??0 ?></span><br>
+                <a href="coiffeuses.php" style="color:#C1622F;font-size:0.75rem;font-weight:600;text-decoration:none">Gerer →</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ALERTES -->
 <?php if(($stats_produits['rupture']??0) > 0 || ($stats_produits['stock_faible']??0) > 0): ?>
 <div style="background:#FFF8E1;border:1px solid #F57F17;border-radius:14px;padding:14px 20px;margin-bottom:25px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <span style="font-size:1.4rem"></span>
     <div style="flex:1">
         <?php if($stats_produits['rupture'] > 0): ?>
             <strong style="color:#F57F17"><?= $stats_produits['rupture'] ?> produit(s) en rupture de stock</strong>
         <?php endif; ?>
         <?php if($stats_produits['stock_faible'] > 0): ?>
             <?php if($stats_produits['rupture'] > 0): ?> · <?php endif; ?>
-            <span style="color:#F57F17"><?= $stats_produits['stock_faible'] ?> produit(s) avec stock faible (≤5)</span>
+            <span style="color:#F57F17"><?= $stats_produits['stock_faible'] ?> produit(s) avec stock faible</span>
         <?php endif; ?>
     </div>
     <a href="products.php" style="background:#F57F17;color:#fff;padding:7px 16px;border-radius:8px;font-size:0.82rem;font-weight:700;text-decoration:none">Voir les produits</a>
@@ -213,7 +183,6 @@ include 'header_admin.php';
 <?php endif; ?>
 
 <div class="row g-4">
-
     <!-- COLONNE GAUCHE -->
     <div class="col-lg-8">
 
@@ -223,7 +192,7 @@ include 'header_admin.php';
         ?>
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5> Revenus des 6 derniers mois</h5>
+                <h5>Revenus des 6 derniers mois</h5>
             </div>
             <div class="dash-card-body">
                 <div class="chart-bar-wrap">
@@ -244,7 +213,7 @@ include 'header_admin.php';
         <!-- DERNIERES COMMANDES -->
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5> Dernieres commandes</h5>
+                <h5>Dernieres commandes</h5>
                 <a href="orders.php" class="dash-link">Voir toutes →</a>
             </div>
             <div class="dash-card-body" style="padding:0">
@@ -285,7 +254,7 @@ include 'header_admin.php';
         <?php if(count($prochains_rdv) > 0): ?>
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5> Prochains rendez-vous</h5>
+                <h5>Prochains rendez-vous</h5>
                 <a href="appointments.php" class="dash-link">Voir tous →</a>
             </div>
             <div class="dash-card-body" style="padding:0">
@@ -320,24 +289,26 @@ include 'header_admin.php';
 
         <!-- ACTIONS RAPIDES -->
         <div class="dash-card mb-4">
-            <div class="dash-card-header"><h5> Actions rapides</h5></div>
+            <div class="dash-card-header"><h5>Actions rapides</h5></div>
             <div class="dash-card-body">
                 <div class="quick-actions">
-                    <a href="products.php?action=add" class="qa-btn">
-                        <div class="qa-btn-icon"></div>
+                    <a href="products.php" class="qa-btn">
                         <div class="qa-btn-label">Nouveau produit</div>
                     </a>
                     <a href="appointments.php" class="qa-btn">
-                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Voir les RDV</div>
                     </a>
                     <a href="orders.php?status=pending" class="qa-btn">
-                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Commandes en attente</div>
                     </a>
                     <a href="users.php" class="qa-btn">
-                        <div class="qa-btn-icon"></div>
                         <div class="qa-btn-label">Voir les clients</div>
+                    </a>
+                    <a href="coiffeuses.php" class="qa-btn">
+                        <div class="qa-btn-label">Gerer les coiffeuses</div>
+                    </a>
+                    <a href="coiffures.php" class="qa-btn">
+                        <div class="qa-btn-label">Inspirations</div>
                     </a>
                 </div>
             </div>
@@ -347,22 +318,20 @@ include 'header_admin.php';
         <?php if(count($ruptures) > 0): ?>
         <div class="dash-card mb-4">
             <div class="dash-card-header">
-                <h5> Ruptures de stock</h5>
+                <h5>Ruptures de stock</h5>
                 <a href="products.php" class="dash-link">Gerer →</a>
             </div>
             <div class="dash-card-body">
                 <?php foreach($ruptures as $p): ?>
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5E6D3">
-                    <div style="width:38px;height:38px;border-radius:8px;overflow:hidden;flex-shrink:0">
+                    <div style="width:38px;height:38px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#F5E6D3;display:flex;align-items:center;justify-content:center">
                         <?php if(!empty($p['image'])): ?>
-                            <img src="<?= htmlspecialchars($p['image']) ?>" style="width:100%;height:100%;object-fit:cover">
-                        <?php else: ?>
-                            <div style="width:100%;height:100%;background:#F5E6D3;display:flex;align-items:center;justify-content:center;font-size:1rem">🌿</div>
+                            <img src="/ecommerce/<?= htmlspecialchars($p['image']) ?>" style="width:100%;height:100%;object-fit:cover">
                         <?php endif; ?>
                     </div>
                     <div style="flex:1">
                         <div style="font-weight:600;color:#3E1F0D;font-size:0.83rem"><?= htmlspecialchars($p['name']) ?></div>
-                        <div style="color:#c62828;font-size:0.72rem;font-weight:600"> Rupture</div>
+                        <div style="color:#c62828;font-size:0.72rem;font-weight:600">Rupture</div>
                     </div>
                     <a href="products.php?edit=<?= $p['id'] ?>" style="background:#fce4e4;color:#c62828;padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;text-decoration:none">Modifier</a>
                 </div>
@@ -374,7 +343,7 @@ include 'header_admin.php';
         <!-- DERNIERS CLIENTS -->
         <div class="dash-card">
             <div class="dash-card-header">
-                <h5>👥 Derniers clients</h5>
+                <h5>Derniers clients</h5>
                 <a href="users.php" class="dash-link">Voir tous →</a>
             </div>
             <div class="dash-card-body">

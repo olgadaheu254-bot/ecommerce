@@ -8,16 +8,14 @@ $success = ''; $error = '';
 // SUPPRIMER COIFFEUSE
 if(isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    // Vérifier si elle a des RDV
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE coiffeuse_id = ?");
     $stmt->execute([$id]);
     $nb_rdv = $stmt->fetchColumn();
-
     if($nb_rdv > 0) {
-        $error = "Impossible de supprimer : cette coiffeuse a $nb_rdv rendez-vous lié(s). Désactivez-la plutôt.";
+        $error = "Impossible de supprimer : cette coiffeuse a $nb_rdv rendez-vous lie(s). Desactivez-la plutot.";
     } else {
         $pdo->prepare("DELETE FROM coiffeuses WHERE id=?")->execute([$id]);
-        $success = "Coiffeuse supprimée avec succès.";
+        $success = "Coiffeuse supprimee avec succes.";
     }
 }
 
@@ -30,38 +28,53 @@ if(isset($_GET['toggle'])) {
 
 // AJOUTER / MODIFIER
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id                 = isset($_POST['coiffeuse_id']) ? (int)$_POST['coiffeuse_id'] : 0;
-    $prenom             = trim($_POST['prenom']);
-    $nom                = trim($_POST['nom']);
-    $specialite         = trim($_POST['specialite']);
-    $bio                = trim($_POST['bio']);
-    $annees_experience  = (int)$_POST['annees_experience'];
-    $disponible         = isset($_POST['disponible']) ? 1 : 0;
-    $photo              = trim($_POST['photo']);
-    $types_cheveux      = isset($_POST['types_cheveux']) ? implode(',', $_POST['types_cheveux']) : '';
+    $id                = isset($_POST['coiffeuse_id']) ? (int)$_POST['coiffeuse_id'] : 0;
+    $prenom            = trim($_POST['prenom']);
+    $nom               = trim($_POST['nom']);
+    $specialite        = trim($_POST['specialite']);
+    $bio               = trim($_POST['bio']);
+    $annees_experience = (int)$_POST['annees_experience'];
+    $disponible        = isset($_POST['disponible']) ? 1 : 0;
+    $types_cheveux     = isset($_POST['types_cheveux']) ? implode(',', $_POST['types_cheveux']) : '';
+    $photo             = trim($_POST['photo']);
 
-    if(empty($prenom) || empty($nom) || empty($specialite)) {
-        $error = "Prénom, nom et spécialité sont obligatoires.";
-    } else {
-        if($id > 0) {
-            $stmt = $pdo->prepare("UPDATE coiffeuses SET prenom=?, nom=?, specialite=?, bio=?, annees_experience=?, disponible=?, photo=?, types_cheveux=? WHERE id=?");
-            if($stmt->execute([$prenom, $nom, $specialite, $bio, $annees_experience, $disponible, $photo, $types_cheveux, $id])) {
-                $success = "Coiffeuse mise à jour avec succès !";
+    if(!empty($_FILES['photo_upload']['name'])) {
+        $upload_dir = '../assets/images/coiffeuses/';
+        if(!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+        $extension = strtolower(pathinfo($_FILES['photo_upload']['name'], PATHINFO_EXTENSION));
+        $formats_autorises = ['jpg', 'jpeg', 'png', 'webp'];
+        if(in_array($extension, $formats_autorises)) {
+            $nom_fichier = 'coiffeuse_' . time() . '_' . rand(100,999) . '.' . $extension;
+            if(move_uploaded_file($_FILES['photo_upload']['tmp_name'], $upload_dir . $nom_fichier)) {
+                $photo = 'assets/images/coiffeuses/' . $nom_fichier;
             } else {
-                $error = "Erreur lors de la mise à jour.";
+                $error = "Erreur lors de l'upload de la photo.";
             }
         } else {
-            $stmt = $pdo->prepare("INSERT INTO coiffeuses (prenom, nom, specialite, bio, annees_experience, disponible, photo, types_cheveux) VALUES (?,?,?,?,?,?,?,?)");
-            if($stmt->execute([$prenom, $nom, $specialite, $bio, $annees_experience, $disponible, $photo, $types_cheveux])) {
-                $success = "Coiffeuse ajoutée avec succès !";
+            $error = "Format non autorise. Utilisez JPG, PNG ou WEBP.";
+        }
+    }
+
+    if(empty($error)) {
+        if(empty($prenom) || empty($nom) || empty($specialite)) {
+            $error = "Prenom, nom et specialite sont obligatoires.";
+        } else {
+            if($id > 0) {
+                $stmt = $pdo->prepare("UPDATE coiffeuses SET prenom=?, nom=?, specialite=?, bio=?, annees_experience=?, disponible=?, photo=?, types_cheveux=? WHERE id=?");
+                if($stmt->execute([$prenom, $nom, $specialite, $bio, $annees_experience, $disponible, $photo, $types_cheveux, $id])) {
+                    $success = "Coiffeuse mise a jour avec succes !";
+                } else { $error = "Erreur lors de la mise a jour."; }
             } else {
-                $error = "Erreur lors de l'ajout.";
+                $stmt = $pdo->prepare("INSERT INTO coiffeuses (prenom, nom, specialite, bio, annees_experience, disponible, photo, types_cheveux) VALUES (?,?,?,?,?,?,?,?)");
+                if($stmt->execute([$prenom, $nom, $specialite, $bio, $annees_experience, $disponible, $photo, $types_cheveux])) {
+                    $success = "Coiffeuse ajoutee avec succes !";
+                } else { $error = "Erreur lors de l'ajout."; }
             }
         }
     }
 }
 
-// COIFFEUSE À MODIFIER
+// COIFFEUSE A MODIFIER
 $edit = null;
 $edit_types = [];
 if(isset($_GET['edit'])) {
@@ -73,20 +86,13 @@ if(isset($_GET['edit'])) {
     }
 }
 
-// LISTE COIFFEUSES
 $coiffeuses = $pdo->query("SELECT c.*, (SELECT COUNT(*) FROM appointments a WHERE a.coiffeuse_id = c.id) as nb_rdv FROM coiffeuses c ORDER BY c.prenom")->fetchAll();
-
-$types_disponibles = ['Bouclés', 'Crépus', 'Lisses', 'Ondulés', 'Tresses', 'Colorations', 'Enfants', 'Soins'];
+$types_disponibles = ['Boucles', 'Crepus', 'Lisses', 'Ondules', 'Tresses', 'Colorations', 'Enfants', 'Soins'];
 
 include 'header_admin.php';
 ?>
 <style>
 .admin-page{background:#FDF8F2;min-height:80vh;padding:30px 0}
-.dash-header{background:linear-gradient(135deg,#3E1F0D,#6B3A2A);border-radius:20px;padding:22px 28px;margin-bottom:25px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
-.dash-header h1{font-family:'Playfair Display',serif;color:#C9A84C;font-size:1.6rem;font-weight:900;margin:0}
-.dash-nav{display:flex;gap:8px;flex-wrap:wrap}
-.dash-nav-btn{background:rgba(201,168,76,0.15);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:7px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;transition:all 0.3s}
-.dash-nav-btn:hover,.dash-nav-btn.active{background:#C9A84C;color:#3E1F0D}
 .dash-card{background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(62,31,13,0.06);border:1px solid #F5E6D3;overflow:hidden;margin-bottom:25px}
 .dash-card-header{background:linear-gradient(135deg,#F5E6D3,#FDEBD0);padding:16px 22px;border-bottom:1px solid #F0D9C0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .dash-card-header h5{font-family:'Playfair Display',serif;color:#3E1F0D;font-weight:700;margin:0;font-size:1rem}
@@ -123,106 +129,85 @@ include 'header_admin.php';
 .checkbox-item:hover{border-color:#C9A84C;background:#FFFDF5}
 .checkbox-item input[type=checkbox]{accent-color:#C9A84C;width:16px;height:16px}
 .checkbox-item.checked{border-color:#C9A84C;background:#FFFDF5}
+.photo-upload-zone{border:2px dashed #C9A84C;border-radius:14px;padding:20px;background:#FFFDF5;text-align:center;cursor:pointer;transition:all 0.3s;position:relative}
+.photo-upload-zone:hover{background:#FFF8E0;border-color:#b8942e}
+.photo-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-preview{width:80px;height:80px;border-radius:12px;object-fit:cover;border:3px solid #C9A84C;margin-bottom:10px}
+.photo-upload-text{color:#6B3A2A;font-size:0.85rem;font-weight:600}
+.photo-upload-hint{color:#9a7c5c;font-size:0.75rem;margin-top:4px}
 </style>
 
 <div class="admin-page"><div class="container">
 
-<div class="dash-header">
-    <div>
-        <h1> Gestion des Coiffeuses</h1>
-        <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($coiffeuses) ?> coiffeuse(s) au total</p>
-    </div>
-    <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn"> Dashboard</a>
-        <a href="products.php" class="dash-nav-btn"> Produits</a>
-        <a href="orders.php" class="dash-nav-btn"> Commandes</a>
-        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
-        <a href="coiffeuses.php" class="dash-nav-btn active"> Coiffeuses</a>
-    </div>
-</div>
+<?php if($success): ?><div class="alert-hr success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+<?php if($error):   ?><div class="alert-hr error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
-<?php if($success): ?><div class="alert-hr success"> <?= htmlspecialchars($success) ?></div><?php endif; ?>
-<?php if($error):   ?><div class="alert-hr error"> <?= htmlspecialchars($error) ?></div><?php endif; ?>
-
-<!-- FORMULAIRE AJOUT / MODIFICATION -->
+<!-- FORMULAIRE -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5><?= $edit ? ' Modifier la coiffeuse' : ' Ajouter une coiffeuse' ?></h5>
+        <h5><?= $edit ? 'Modifier la coiffeuse' : 'Ajouter une coiffeuse' ?></h5>
         <?php if($edit): ?>
             <a href="coiffeuses.php" class="pbtn pbtn-sm">+ Nouvelle coiffeuse</a>
         <?php endif; ?>
     </div>
     <div class="dash-card-body">
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
             <?php if($edit): ?>
                 <input type="hidden" name="coiffeuse_id" value="<?= $edit['id'] ?>">
             <?php endif; ?>
+            <input type="hidden" name="photo" value="<?= htmlspecialchars($edit['photo']??'') ?>">
 
             <div class="row g-3">
-                <!-- PRENOM -->
                 <div class="col-md-3">
-                    <label class="plabel">Prénom *</label>
-                    <input type="text" class="pinput" name="prenom"
-                           value="<?= htmlspecialchars($edit['prenom']??'') ?>"
-                           placeholder="Ex: Aminata" required>
+                    <label class="plabel">Prenom *</label>
+                    <input type="text" class="pinput" name="prenom" value="<?= htmlspecialchars($edit['prenom']??'') ?>" placeholder="Ex: Aminata" required>
                 </div>
-
-                <!-- NOM -->
                 <div class="col-md-3">
                     <label class="plabel">Nom *</label>
-                    <input type="text" class="pinput" name="nom"
-                           value="<?= htmlspecialchars($edit['nom']??'') ?>"
-                           placeholder="Ex: Diallo" required>
+                    <input type="text" class="pinput" name="nom" value="<?= htmlspecialchars($edit['nom']??'') ?>" placeholder="Ex: Diallo" required>
                 </div>
-
-                <!-- SPECIALITE -->
                 <div class="col-md-4">
-                    <label class="plabel">Spécialité *</label>
-                    <input type="text" class="pinput" name="specialite"
-                           value="<?= htmlspecialchars($edit['specialite']??'') ?>"
-                           placeholder="Ex: Experte en tresses africaines" required>
+                    <label class="plabel">Specialite *</label>
+                    <input type="text" class="pinput" name="specialite" value="<?= htmlspecialchars($edit['specialite']??'') ?>" placeholder="Ex: Experte en tresses africaines" required>
                 </div>
-
-                <!-- EXPERIENCE -->
                 <div class="col-md-2">
-                    <label class="plabel">Années d'expérience</label>
-                    <input type="number" class="pinput" name="annees_experience"
-                           min="0" max="50"
-                           value="<?= $edit['annees_experience']??0 ?>">
+                    <label class="plabel">Annees d'experience</label>
+                    <input type="number" class="pinput" name="annees_experience" min="0" max="50" value="<?= $edit['annees_experience']??0 ?>">
                 </div>
 
-                <!-- PHOTO URL -->
                 <div class="col-md-8">
-                    <label class="plabel">URL de la photo</label>
-                    <input type="text" class="pinput" name="photo"
-                           value="<?= htmlspecialchars($edit['photo']??'') ?>"
-                           placeholder="Ex: assets/images/coiffeuses/aminata.jpg">
+                    <label class="plabel">Photo de la coiffeuse</label>
+                    <div class="photo-upload-zone" id="uploadZone">
+                        <input type="file" name="photo_upload" accept="image/jpeg,image/png,image/webp" id="photoInput" onchange="previewPhoto(this)">
+                        <?php if(!empty($edit['photo'])): ?>
+                            <img src="/ecommerce/<?= htmlspecialchars($edit['photo']) ?>" class="photo-preview" id="photoPreview">
+                            <div class="photo-upload-text">Cliquer pour changer la photo</div>
+                        <?php else: ?>
+                            <img src="" class="photo-preview" id="photoPreview" style="display:none">
+                            <div class="photo-upload-text">Cliquer pour uploader une photo</div>
+                        <?php endif; ?>
+                        <div class="photo-upload-hint">JPG, PNG ou WEBP — Max 5 Mo</div>
+                    </div>
                 </div>
 
-                <!-- DISPONIBILITE -->
                 <div class="col-md-4 d-flex align-items-end pb-1">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="disponible" id="disponible"
                                <?= ($edit['disponible']??1) ? 'checked' : '' ?>
                                style="border-color:#C9A84C;accent-color:#C9A84C">
-                        <label class="form-check-label" for="disponible"
-                               style="color:#3E1F0D;font-weight:600;font-size:0.85rem">
-                             Disponible pour les RDV
+                        <label class="form-check-label" for="disponible" style="color:#3E1F0D;font-weight:600;font-size:0.85rem">
+                            Disponible pour les RDV
                         </label>
                     </div>
                 </div>
 
-                <!-- BIO -->
                 <div class="col-12">
                     <label class="plabel">Biographie</label>
-                    <textarea class="pinput" name="bio" rows="3"
-                              placeholder="Décrivez le parcours et la personnalité de la coiffeuse..."><?= htmlspecialchars($edit['bio']??'') ?></textarea>
+                    <textarea class="pinput" name="bio" rows="3" placeholder="Decrivez le parcours..."><?= htmlspecialchars($edit['bio']??'') ?></textarea>
                 </div>
 
-                <!-- TYPES DE CHEVEUX -->
                 <div class="col-12">
-                    <label class="plabel">Types de cheveux maîtrisés</label>
+                    <label class="plabel">Types de cheveux maitrise</label>
                     <div class="checkbox-grid">
                         <?php foreach($types_disponibles as $type): ?>
                         <label class="checkbox-item <?= in_array($type, $edit_types)?'checked':'' ?>">
@@ -234,10 +219,9 @@ include 'header_admin.php';
                     </div>
                 </div>
 
-                <!-- BOUTON SUBMIT -->
                 <div class="col-12 text-end">
                     <button type="submit" class="pbtn">
-                        <?= $edit ? ' Mettre à jour' : ' Ajouter la coiffeuse' ?>
+                        <?= $edit ? 'Mettre a jour' : 'Ajouter la coiffeuse' ?>
                     </button>
                 </div>
             </div>
@@ -245,10 +229,10 @@ include 'header_admin.php';
     </div>
 </div>
 
-<!-- LISTE DES COIFFEUSES -->
+<!-- LISTE -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5> Liste des coiffeuses (<?= count($coiffeuses) ?>)</h5>
+        <h5>Liste des coiffeuses (<?= count($coiffeuses) ?>)</h5>
     </div>
     <div style="overflow-x:auto">
     <?php if(count($coiffeuses) > 0): ?>
@@ -256,9 +240,9 @@ include 'header_admin.php';
         <thead><tr>
             <th>Photo</th>
             <th>Nom</th>
-            <th>Spécialité</th>
+            <th>Specialite</th>
             <th>Types de cheveux</th>
-            <th>Expérience</th>
+            <th>Experience</th>
             <th>RDV</th>
             <th>Statut</th>
             <th>Actions</th>
@@ -272,56 +256,32 @@ include 'header_admin.php';
                 <?php if(!empty($c['photo'])): ?>
                     <img src="/ecommerce/<?= htmlspecialchars($c['photo']) ?>" class="coif-img">
                 <?php else: ?>
-                    <div class="coif-initiales">
-                        <?= strtoupper(substr($c['prenom'],0,1).substr($c['nom'],0,1)) ?>
-                    </div>
+                    <div class="coif-initiales"><?= strtoupper(substr($c['prenom'],0,1).substr($c['nom'],0,1)) ?></div>
                 <?php endif; ?>
             </td>
-            <td>
-                <div style="font-weight:700"><?= htmlspecialchars($c['prenom'].' '.$c['nom']) ?></div>
-            </td>
+            <td><div style="font-weight:700"><?= htmlspecialchars($c['prenom'].' '.$c['nom']) ?></div></td>
             <td style="color:#6B3A2A;font-size:0.83rem"><?= htmlspecialchars($c['specialite']) ?></td>
-            <td>
-                <?php foreach($types as $t): ?>
-                    <span class="type-tag"><?= htmlspecialchars($t) ?></span>
-                <?php endforeach; ?>
-            </td>
-            <td style="text-align:center;font-weight:700">
-                <?= $c['annees_experience'] ?? 0 ?> ans
-            </td>
-            <td style="text-align:center;font-weight:700;color:#C1622F">
-                <?= $c['nb_rdv'] ?>
-            </td>
+            <td><?php foreach($types as $t): ?><span class="type-tag"><?= htmlspecialchars($t) ?></span><?php endforeach; ?></td>
+            <td style="text-align:center;font-weight:700"><?= $c['annees_experience'] ?? 0 ?> ans</td>
+            <td style="text-align:center;font-weight:700;color:#C1622F"><?= $c['nb_rdv'] ?></td>
             <td>
                 <?php if($c['disponible']): ?>
-                    <span class="badge-dispo"> Disponible</span>
+                    <span class="badge-dispo">Disponible</span>
                 <?php else: ?>
-                    <span class="badge-indispo"> Indisponible</span>
+                    <span class="badge-indispo">Indisponible</span>
                 <?php endif; ?>
             </td>
             <td>
                 <div style="display:flex;gap:5px;flex-wrap:wrap">
-                    <!-- MODIFIER -->
-                    <a href="?edit=<?= $c['id'] ?>" class="pbtn-info"> Modifier</a>
-
-                    <!-- TOGGLE DISPO -->
+                    <a href="?edit=<?= $c['id'] ?>" class="pbtn-info">Modifier</a>
                     <a href="?toggle=<?= $c['id'] ?>"
                        class="<?= $c['disponible'] ? 'pbtn-warning' : 'pbtn-success' ?>"
                        onclick="return confirm('<?= $c['disponible'] ? 'Rendre indisponible ?' : 'Rendre disponible ?' ?>')">
-                        <?= $c['disponible'] ? '⏸ Désactiver' : '▶ Activer' ?>
+                        <?= $c['disponible'] ? 'Desactiver' : 'Activer' ?>
                     </a>
-
-                    <!-- SUPPRIMER -->
                     <?php if($c['nb_rdv'] == 0): ?>
                         <a href="?delete=<?= $c['id'] ?>" class="pbtn-danger"
-                           onclick="return confirm('Supprimer définitivement cette coiffeuse ?')">
-                             Supprimer
-                        </a>
-                    <?php else: ?>
-                        <span style="background:#F5E6D3;color:#9a7c5c;border-radius:8px;padding:6px 12px;font-size:0.75rem;font-weight:600"
-                              title="<?= $c['nb_rdv'] ?> RDV lié(s) — désactivez plutôt">
-                             <?= $c['nb_rdv'] ?> RDV
-                        </span>
+                           onclick="return confirm('Supprimer cette coiffeuse ?')">Supprimer</a>
                     <?php endif; ?>
                 </div>
             </td>
@@ -331,9 +291,7 @@ include 'header_admin.php';
     </table>
     <?php else: ?>
     <div style="text-align:center;padding:40px;color:#9a7c5c">
-        <div style="font-size:3rem;margin-bottom:15px"></div>
         <h5 style="color:#3E1F0D">Aucune coiffeuse pour le moment</h5>
-        <p>Ajoutez votre première coiffeuse avec le formulaire ci-dessus</p>
     </div>
     <?php endif; ?>
     </div>
@@ -342,12 +300,31 @@ include 'header_admin.php';
 </div></div>
 
 <script>
-// Mettre à jour le style des checkboxes au clic
 document.querySelectorAll('.checkbox-item input').forEach(cb => {
     cb.addEventListener('change', function() {
         this.closest('.checkbox-item').classList.toggle('checked', this.checked);
     });
 });
+
+function previewPhoto(input) {
+    const preview = document.getElementById('photoPreview');
+    const zone = document.getElementById('uploadZone');
+    if(input.files && input.files[0]) {
+        if(input.files[0].size > 5 * 1024 * 1024) {
+            alert('La photo est trop grande. Maximum 5 Mo.');
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            const textEl = zone.querySelector('.photo-upload-text');
+            if(textEl) textEl.textContent = 'Photo selectionnee — cliquer pour changer';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 </script>
 
 <?php include 'footer_admin.php'; ?>

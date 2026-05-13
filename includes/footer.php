@@ -10,13 +10,13 @@ function addToCart(productId) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            showToast('✅ Produit ajouté au panier !', 'success');
+            showToast(' Produit ajouté au panier !', 'success');
             setTimeout(() => location.reload(), 1000);
         } else {
-            showToast('❌ ' + data.message, 'danger');
+            showToast(' ' + data.message, 'danger');
         }
     })
-    .catch(() => showToast('❌ Erreur lors de l\'ajout au panier', 'danger'));
+    .catch(() => showToast(' Erreur lors de l\'ajout au panier', 'danger'));
 }
 
 function showToast(message, type) {

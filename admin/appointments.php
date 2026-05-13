@@ -1,12 +1,7 @@
 <?php
+require_once 'auth_admin.php';
 require_once '../config/database.php';
 $page_title = 'Gestion des Rendez-vous - HairRoots Admin';
-
-// Protection admin
-if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: /ecommerce/user/login.php');
-    exit;
-}
 
 // CHANGER STATUT
 if(isset($_GET['statut']) && isset($_GET['id'])) {
@@ -26,35 +21,29 @@ if(isset($_GET['delete'])) {
 }
 
 // FILTRES
-$filtre_statut = isset($_GET['statut_filtre']) ? $_GET['statut_filtre'] : '';
+$filtre_statut    = isset($_GET['statut_filtre'])    ? $_GET['statut_filtre']         : '';
 $filtre_coiffeuse = isset($_GET['coiffeuse_filtre']) ? (int)$_GET['coiffeuse_filtre'] : 0;
-$filtre_date = isset($_GET['date_filtre']) ? $_GET['date_filtre'] : '';
+$filtre_date      = isset($_GET['date_filtre'])      ? $_GET['date_filtre']            : '';
 
 $where = []; $params = [];
-if($filtre_statut) { $where[] = "a.statut = ?"; $params[] = $filtre_statut; }
+if($filtre_statut)    { $where[] = "a.statut = ?";       $params[] = $filtre_statut; }
 if($filtre_coiffeuse) { $where[] = "a.coiffeuse_id = ?"; $params[] = $filtre_coiffeuse; }
-if($filtre_date) { $where[] = "a.date_rdv = ?"; $params[] = $filtre_date; }
+if($filtre_date)      { $where[] = "a.date_rdv = ?";     $params[] = $filtre_date; }
 $where_sql = count($where) ? 'WHERE '.implode(' AND ', $where) : '';
 
 $stmt = $pdo->prepare("SELECT a.*, c.prenom as c_prenom, c.nom as c_nom, c.specialite FROM appointments a LEFT JOIN coiffeuses c ON a.coiffeuse_id = c.id $where_sql ORDER BY a.date_rdv DESC, a.heure_rdv DESC");
-$stmt->execute($params); $appointments = $stmt->fetchAll();
+$stmt->execute($params);
+$appointments = $stmt->fetchAll();
 
-$stmt = $pdo->query("SELECT * FROM coiffeuses ORDER BY prenom");
-$coiffeuses = $stmt->fetchAll();
+$coiffeuses = $pdo->query("SELECT * FROM coiffeuses ORDER BY prenom")->fetchAll();
 
-// Stats
 $stats = $pdo->query("SELECT statut, COUNT(*) as total FROM appointments GROUP BY statut")->fetchAll(PDO::FETCH_KEY_PAIR);
 $total_rdv = array_sum($stats);
 
-include '../includes/header.php';
+include 'header_admin.php';
 ?>
 <style>
 .admin-page{background:#FDF8F2;min-height:80vh;padding:30px 0}
-.admin-header{background:linear-gradient(135deg,#3E1F0D,#6B3A2A);border-radius:20px;padding:25px 30px;margin-bottom:25px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
-.admin-header h1{font-family:'Playfair Display',serif;color:#C9A84C;font-size:1.8rem;font-weight:900;margin:0}
-.stat-box{background:rgba(255,255,255,0.1);border-radius:12px;padding:12px 20px;text-align:center;min-width:80px}
-.stat-box .num{font-size:1.6rem;font-weight:900;color:#C9A84C;font-family:'Playfair Display',serif}
-.stat-box .lbl{font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:2px}
 .filter-card{background:#fff;border-radius:16px;box-shadow:0 4px 15px rgba(62,31,13,0.06);border:1px solid #F5E6D3;padding:20px;margin-bottom:20px}
 .f-input{border:2px solid #F5E6D3;border-radius:10px;padding:9px 14px;font-size:0.88rem;transition:all 0.3s;background:#FDFAF7;width:100%}
 .f-input:focus{border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,0.1);outline:none}
@@ -76,22 +65,19 @@ include '../includes/header.php';
 .btn-confirm{background:#e8f5e9;color:#2e7d32}.btn-confirm:hover{background:#2e7d32;color:#fff}
 .btn-cancel{background:#FFF8E1;color:#F57F17}.btn-cancel:hover{background:#F57F17;color:#fff}
 .btn-delete{background:#fce4e4;color:#c62828}.btn-delete:hover{background:#c62828;color:#fff}
-.empty-state{text-align:center;padding:50px;color:#9a7c5c}
+.stat-box{background:rgba(201,168,76,0.15);border-radius:12px;padding:12px 20px;text-align:center;min-width:80px;display:inline-block;margin:4px}
+.stat-box .num{font-size:1.4rem;font-weight:900;color:#C9A84C;font-family:'Playfair Display',serif}
+.stat-box .lbl{font-size:0.72rem;color:#6B3A2A;margin-top:2px}
 </style>
 
 <div class="admin-page"><div class="container">
 
-<div class="admin-header">
-    <div>
-        <h1> Gestion des Rendez-vous</h1>
-        <p style="color:rgba(255,255,255,0.6);margin:5px 0 0;font-size:0.88rem">HairRoots Admin</p>
-    </div>
-    <div class="d-flex gap-3 flex-wrap">
-        <div class="stat-box"><div class="num"><?= $total_rdv ?></div><div class="lbl">Total</div></div>
-        <div class="stat-box"><div class="num"><?= $stats['en attente']??0 ?></div><div class="lbl">En attente</div></div>
-        <div class="stat-box"><div class="num"><?= $stats['confirme']??0 ?></div><div class="lbl">Confirmes</div></div>
-        <div class="stat-box"><div class="num"><?= $stats['annule']??0 ?></div><div class="lbl">Annules</div></div>
-    </div>
+<!-- STATS RAPIDES -->
+<div style="background:#fff;border-radius:16px;border:1px solid #F5E6D3;padding:20px;margin-bottom:25px;display:flex;gap:15px;flex-wrap:wrap;align-items:center">
+    <div class="stat-box"><div class="num"><?= $total_rdv ?></div><div class="lbl">Total</div></div>
+    <div class="stat-box"><div class="num" style="color:#F57F17"><?= $stats['en attente']??0 ?></div><div class="lbl">En attente</div></div>
+    <div class="stat-box"><div class="num" style="color:#2E7D32"><?= $stats['confirme']??0 ?></div><div class="lbl">Confirmes</div></div>
+    <div class="stat-box"><div class="num" style="color:#C62828"><?= $stats['annule']??0 ?></div><div class="lbl">Annules</div></div>
 </div>
 
 <!-- FILTRES -->
@@ -130,7 +116,7 @@ include '../includes/header.php';
 
 <!-- TABLEAU -->
 <div class="rdv-table">
-    <?php if(count($appointments)>0): ?>
+    <?php if(count($appointments) > 0): ?>
     <div class="table-responsive">
     <table>
         <thead>
@@ -187,7 +173,7 @@ include '../includes/header.php';
         <?php if(!empty($a['message'])): ?>
         <tr style="background:#FDFAF7">
             <td colspan="8" style="padding:8px 16px;font-size:0.8rem;color:#6B3A2A;border-bottom:1px solid #F5E6D3">
-                 <em><?= htmlspecialchars($a['message']) ?></em>
+                <em><?= htmlspecialchars($a['message']) ?></em>
             </td>
         </tr>
         <?php endif; ?>
@@ -196,8 +182,7 @@ include '../includes/header.php';
     </table>
     </div>
     <?php else: ?>
-    <div class="empty-state">
-        <div style="font-size:3rem;margin-bottom:15px"></div>
+    <div style="text-align:center;padding:50px;color:#9a7c5c">
         <h5 style="color:#3E1F0D">Aucun rendez-vous</h5>
         <p>Aucun RDV ne correspond a vos filtres.</p>
     </div>
@@ -205,4 +190,4 @@ include '../includes/header.php';
 </div>
 
 </div></div>
-<?php include '../includes/header.php'; ?>
+<?php include 'footer_admin.php'; ?>

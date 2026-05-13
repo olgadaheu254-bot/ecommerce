@@ -46,6 +46,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO appointments (user_id,coiffeuse_id,nom_client,prenom_client,email,telephone,date_rdv,heure_rdv,type_prestation,type_cheveux,message,statut) VALUES (?,?,?,?,?,?,?,?,?,?,?,'en attente')");
             if($stmt->execute([$user_id,$coiffeuse_id,$nom_client,$prenom_client,$email,$telephone,$date_rdv,$heure_rdv,$type_prestation,$type_cheveux,$message])) {
                 $success = true;
+
+                        // Envoi email confirmation de rendez-vous
+                        require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce/includes/Mailer.php';
+                        $mailer = new Mailer();
+
+                        // Formatage de la date en francais
+                        $mois = ['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+                        $dateObj = new DateTime($date_rdv);
+                        $dateFr  = $dateObj->format('d') . ' ' . $mois[(int)$dateObj->format('m') - 1] . ' ' . $dateObj->format('Y');
+                        $timeFr  = str_replace(':', 'h', $heure_rdv);
+
+                        // Recuperer le nom de la coiffeuse
+                        $stylist = '';
+                        foreach($coiffeuses as $c) {
+                            if($c['id'] == $coiffeuse_id) {
+                                $stylist = $c['prenom'] . ' ' . $c['nom'];
+                                break;
+                            }
+                        }
+
+                        $mailer->sendAppointmentConfirmation(
+                            $email,
+                            $prenom_client,
+                            $type_prestation,
+                            $dateFr,
+                            $timeFr,
+                            $stylist,
+                            (int)$pdo->lastInsertId()
+                        );
             } else {
                 $error = "Erreur lors de la reservation. Veuillez reessayer.";
             }
@@ -127,7 +156,7 @@ include 'includes/header.php';
             <p style="color:#6B3A2A;font-size:1rem;margin:10px 0 25px">Votre reservation a bien ete enregistree. Nous vous contacterons pour confirmer votre creneau.</p>
             <div style="background:linear-gradient(135deg,#F5E6D3,#FDEBD0);border-radius:14px;padding:20px;margin-bottom:25px;text-align:left">
                 <p style="color:#9a7c5c;font-size:0.82rem;margin:0 0 3px;font-weight:600">RECAPITULATIF</p>
-                <p style="color:#3E1F0D;font-weight:700;margin:5px 0">👤 <?= htmlspecialchars($_POST['prenom_client'].' '.$_POST['nom_client']) ?></p>
+                <p style="color:#3E1F0D;font-weight:700;margin:5px 0"> <?= htmlspecialchars($_POST['prenom_client'].' '.$_POST['nom_client']) ?></p>
                 <p style="color:#6B3A2A;margin:5px 0"><?= date('d/m/Y', strtotime($_POST['date_rdv'])) ?> a <?= htmlspecialchars($_POST['heure_rdv']) ?></p>
                 <p style="color:#6B3A2A;margin:5px 0"> <?= htmlspecialchars($_POST['type_prestation']) ?></p>
                 <p style="color:#6B3A2A;margin:5px 0"> Cheveux <?= htmlspecialchars($_POST['type_cheveux']) ?></p>
@@ -226,7 +255,7 @@ include 'includes/header.php';
         </div>
 
         <!-- INFOS CLIENT -->
-        <div class="rdv-section">👤 Vos informations</div>
+        <div class="rdv-section"> Vos informations</div>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="rdv-label">Prenom *</label>

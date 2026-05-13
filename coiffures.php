@@ -161,11 +161,11 @@ include 'includes/header.php';
 
     <!-- GRILLE MODELES -->
     <?php if(count($modeles) > 0): ?>
-    <div class="row g-4">
+    <div class="scroll-horizontal">
         <?php foreach($modeles as $m):
             $diff_class = $m['difficulte']==='Facile'?'diff-facile':($m['difficulte']==='Difficile'?'diff-difficile':'diff-moyen');
         ?>
-        <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="scroll-item">
             <div class="modele-card">
                 <div class="modele-img-wrap">
                     <?php if(!empty($m['photo'])): ?>
@@ -174,9 +174,13 @@ include 'includes/header.php';
                         <div class="modele-img-ph">
                             <?php $icons=['Bouclés'=>'','Crépus'=>'','Lisses'=>'','Ondulés'=>'']; echo $icons[$m['type_cheveux']]??''; ?>
                         </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                        <button class="btn-favori-bottom" style="width:auto;position:absolute;top:10px;left:10px;z-index:10;background:rgba(255,255,255,0.9);border-radius:50%;width:36px!important;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1);border:none;cursor:pointer;color:#9a7c5c;" 
+                            onclick="toggleInspiRation(this, <?= $m['id'] ?>)">
+                            <i class="bi bi-heart"></i>
+                        </button>
                     <?php if($m['tendance']): ?>
-                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#C9A84C,#b8942e);color:#3E1F0D;padding:3px 10px;border-radius:10px;font-size:0.7rem;font-weight:700">🔥 Tendance</div>
+                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#C9A84C,#b8942e);color:#3E1F0D;padding:3px 10px;border-radius:10px;font-size:0.7rem;font-weight:700"> Tendance</div>
                     <?php endif; ?>
                 </div>
                 <div class="modele-body">
@@ -191,7 +195,7 @@ include 'includes/header.php';
                     </div>
                     <div class="modele-info">
                         <span class="modele-prix">A partir de <?= number_format($m['prix_estimation'],2) ?>€</span>
-                        <span class="modele-duree">⏱ <?= htmlspecialchars($m['duree_realisation']) ?></span>
+                        <span class="modele-duree"> <?= htmlspecialchars($m['duree_realisation']) ?></span>
                     </div>
                     <a href="rendez-vous.php?prestation=<?= urlencode($m['nom']) ?>" class="btn-rdv-inspi">
                         Reserver ce style
@@ -213,4 +217,5 @@ include 'includes/header.php';
 
 </div>
 </div>
+<div class="toast-prod" id="toast-prod"></div>
 <?php include 'includes/footer.php'; ?>

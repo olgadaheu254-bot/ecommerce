@@ -16,8 +16,26 @@ if(isset($_GET['statut']) && isset($_GET['id'])) {
     $new_statut = $_GET['statut'];
     $order_id   = (int)$_GET['id'];
     if(in_array($new_statut, $statuts_valides)) {
-        $pdo->prepare("UPDATE orders SET status=? WHERE id=?")->execute([$new_statut, $order_id]);
+       $pdo->prepare("UPDATE orders SET status=? WHERE id=?")->execute([$new_statut, $order_id]);
         $success = "Statut mis a jour !";
+
+        // Recuperer les infos du client pour l'email
+        $stmt_client = $pdo->prepare("SELECT u.email, u.first_name, o.order_number FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ?");
+        $stmt_client->execute([$order_id]);
+        $client = $stmt_client->fetch();
+
+        if ($client && in_array($new_statut, ['processing', 'shipped', 'delivered'])) {
+            require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce/includes/Mailer.php';
+            $mailer = new Mailer();
+            $mailer->sendShippingUpdate(
+                $client['email'],
+                $client['first_name'],
+                $order_id,
+                $new_statut,
+                '',
+                ''
+            );
+        }
     }
 }
 
@@ -27,7 +45,7 @@ $filtre_date   = isset($_GET['date'])    ? $_GET['date']           : '';
 $search        = isset($_GET['search'])  ? trim($_GET['search'])   : '';
 
 $where = []; $params = [];
-if($filtre_statut) { $where[] = "o.status = ?";          $params[] = $filtre_statut; }
+if($filtre_statut) { $where[] = "o.status = ?";           $params[] = $filtre_statut; }
 if($filtre_date)   { $where[] = "DATE(o.created_at) = ?"; $params[] = $filtre_date; }
 if($search)        { $where[] = "(o.order_number LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%"]); }
 $where_sql = count($where) ? 'WHERE '.implode(' AND ',$where) : '';
@@ -73,11 +91,6 @@ $sl = [
 ?>
 <style>
 .admin-page{background:#FDF8F2;min-height:80vh;padding:30px 0}
-.dash-header{background:linear-gradient(135deg,#3E1F0D,#6B3A2A);border-radius:20px;padding:22px 28px;margin-bottom:25px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
-.dash-header h1{font-family:'Playfair Display',serif;color:#C9A84C;font-size:1.6rem;font-weight:900;margin:0}
-.dash-nav{display:flex;gap:8px;flex-wrap:wrap}
-.dash-nav-btn{background:rgba(201,168,76,0.15);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:7px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;transition:all 0.3s}
-.dash-nav-btn:hover,.dash-nav-btn.active{background:#C9A84C;color:#3E1F0D}
 .stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 15px rgba(62,31,13,0.05);border:1px solid #F5E6D3;text-align:center;transition:all 0.3s;cursor:pointer;text-decoration:none;display:block}
 .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(62,31,13,0.1)}
 .stat-card.active-filter{border-color:#C9A84C;background:#FFFDF5}
@@ -105,8 +118,6 @@ $sl = [
 .filter-bar{background:#fff;border-radius:14px;box-shadow:0 4px 15px rgba(62,31,13,0.05);border:1px solid #F5E6D3;padding:16px 20px;margin-bottom:20px}
 .alert-hr{border-radius:12px;padding:12px 18px;margin-bottom:20px;font-size:0.9rem;border:none}
 .alert-hr.success{background:#e8f5e9;color:#2e7d32;border-left:4px solid #2e7d32}
-
-/* DETAIL MODAL */
 .detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(62,31,13,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 .detail-modal{background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
 .detail-modal-header{background:linear-gradient(135deg,#3E1F0D,#6B3A2A);padding:20px 25px;display:flex;align-items:center;justify-content:space-between;border-radius:20px 20px 0 0}
@@ -118,21 +129,7 @@ $sl = [
 
 <div class="admin-page"><div class="container">
 
-<div class="dash-header">
-    <div>
-        <h1> Gestion des Commandes</h1>
-        <p style="color:rgba(255,255,255,0.6);margin:4px 0 0;font-size:0.82rem"><?= count($orders) ?> commande(s) affichee(s)</p>
-    </div>
-    <div class="dash-nav">
-        <a href="index.php" class="dash-nav-btn"> Dashboard</a>
-        <a href="products.php" class="dash-nav-btn"> Produits</a>
-        <a href="orders.php" class="dash-nav-btn active"> Commandes</a>
-        <a href="users.php" class="dash-nav-btn"> Utilisateurs</a>
-        <a href="appointments.php" class="dash-nav-btn"> RDV</a>
-    </div>
-</div>
-
-<?php if($success): ?><div class="alert-hr success"> <?= htmlspecialchars($success) ?></div><?php endif; ?>
+<?php if($success): ?><div class="alert-hr success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
 <!-- STATS RAPIDES -->
 <div class="row g-3 mb-4">
@@ -161,7 +158,7 @@ $sl = [
 <!-- FILTRES -->
 <div class="filter-bar">
     <form method="GET" action="" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <input type="text" class="pinput" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="🔍 N° commande, client..." style="max-width:220px">
+        <input type="text" class="pinput" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="N° commande, client..." style="max-width:220px">
         <input type="date" class="pinput" name="date" value="<?= htmlspecialchars($filtre_date) ?>" style="max-width:160px">
         <select class="pinput" name="status" style="max-width:180px">
             <option value="">Tous les statuts</option>
@@ -177,7 +174,7 @@ $sl = [
 <!-- TABLEAU COMMANDES -->
 <div class="dash-card">
     <div class="dash-card-header">
-        <h5> Liste des commandes</h5>
+        <h5>Liste des commandes</h5>
         <span style="color:#9a7c5c;font-size:0.82rem">Revenu total : <strong style="color:#C1622F"><?= number_format($stats['revenu'],2) ?>€</strong></span>
     </div>
     <div style="overflow-x:auto">
@@ -213,7 +210,7 @@ $sl = [
             </td>
             <td style="color:#9a7c5c;font-size:0.78rem;white-space:nowrap"><?= date('d/m/Y H:i',strtotime($o['created_at'])) ?></td>
             <td>
-                <a href="?detail=<?= $o['id'] ?><?= $filtre_statut?'&status='.$filtre_statut:'' ?>" class="pbtn pbtn-sm">👁️ Detail</a>
+                <a href="?detail=<?= $o['id'] ?><?= $filtre_statut?'&status='.$filtre_statut:'' ?>" class="pbtn pbtn-sm">Detail</a>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -221,7 +218,6 @@ $sl = [
     </table>
     <?php else: ?>
     <div style="text-align:center;padding:40px;color:#9a7c5c">
-        <div style="font-size:3rem;margin-bottom:15px"></div>
         <h5 style="color:#3E1F0D">Aucune commande trouvee</h5>
     </div>
     <?php endif; ?>
@@ -237,15 +233,13 @@ $sl = [
                 <h5 style="font-family:'Playfair Display',serif;color:#C9A84C;margin:0;font-weight:700"><?= htmlspecialchars($detail_order['order_number']) ?></h5>
                 <p style="color:rgba(255,255,255,0.6);font-size:0.8rem;margin:3px 0 0"><?= date('d/m/Y H:i',strtotime($detail_order['created_at'])) ?></p>
             </div>
-            <a href="orders.php" class="close-btn">✕</a>
+            <a href="orders.php" class="close-btn">x</a>
         </div>
         <div class="detail-modal-body">
-
-            <!-- INFOS CLIENT -->
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div style="background:#F5E6D3;border-radius:12px;padding:15px">
-                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Client</h6>
+                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">Client</h6>
                         <p style="margin:3px 0;font-size:0.88rem;color:#6B3A2A"><strong><?= htmlspecialchars($detail_order['first_name'].' '.$detail_order['last_name']) ?></strong></p>
                         <p style="margin:3px 0;font-size:0.82rem;color:#6B3A2A"><?= htmlspecialchars($detail_order['email']) ?></p>
                         <?php if(!empty($detail_order['phone'])): ?>
@@ -255,20 +249,19 @@ $sl = [
                 </div>
                 <div class="col-md-6">
                     <div style="background:#F5E6D3;border-radius:12px;padding:15px">
-                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px"> Adresse de livraison</h6>
+                        <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:10px">Adresse de livraison</h6>
                         <p style="margin:0;font-size:0.82rem;color:#6B3A2A;white-space:pre-line"><?= htmlspecialchars($detail_order['shipping_address']??'Non renseignee') ?></p>
                     </div>
                 </div>
             </div>
 
-            <!-- ARTICLES -->
-            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px"> Articles commandes</h6>
+            <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px">Articles commandes</h6>
             <?php foreach($detail_items as $item): ?>
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F5E6D3">
                 <?php if(!empty($item['image'])): ?>
                     <img src="<?= htmlspecialchars($item['image']) ?>" style="width:50px;height:50px;border-radius:8px;object-fit:cover;flex-shrink:0">
                 <?php else: ?>
-                    <div style="width:50px;height:50px;border-radius:8px;background:#F5E6D3;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0"></div>
+                    <div style="width:50px;height:50px;border-radius:8px;background:#F5E6D3;flex-shrink:0"></div>
                 <?php endif; ?>
                 <div style="flex:1">
                     <div style="font-weight:600;color:#3E1F0D;font-size:0.88rem"><?= htmlspecialchars($item['name']) ?></div>
@@ -278,19 +271,17 @@ $sl = [
             </div>
             <?php endforeach; ?>
 
-            <!-- TOTAL -->
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:15px;padding-top:15px;border-top:2px solid #F5E6D3">
                 <span style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#3E1F0D">Total</span>
                 <span style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:#C1622F"><?= number_format($detail_order['total_amount'],2) ?>€</span>
             </div>
 
-            <!-- CHANGER STATUT -->
             <div style="background:#F5E6D3;border-radius:12px;padding:15px;margin-top:20px">
-                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px"> Changer le statut</h6>
+                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:12px">Changer le statut</h6>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <?php foreach($sl as $val=>$info): ?>
                     <a href="?statut=<?= $val ?>&id=<?= $detail_order['id'] ?>&detail=<?= $detail_order['id'] ?>"
-                       style="background:<?= $detail_order['status']===$val?$info[2]:'#fff' ?>;color:<?= $detail_order['status']===$val?'#fff':'#3E1F0D' ?>;padding:7px 16px;border-radius:10px;font-size:0.8rem;font-weight:700;text-decoration:none;border:2px solid <?= $info[2] ?>;transition:all 0.2s">
+                       style="background:<?= $detail_order['status']===$val?$info[2]:'#fff' ?>;color:<?= $detail_order['status']===$val?'#fff':'#3E1F0D' ?>;padding:7px 16px;border-radius:10px;font-size:0.8rem;font-weight:700;text-decoration:none;border:2px solid <?= $info[2] ?>">
                         <?= $info[0] ?>
                     </a>
                     <?php endforeach; ?>
@@ -299,11 +290,10 @@ $sl = [
 
             <?php if(!empty($detail_order['notes'])): ?>
             <div style="background:#FFF8E1;border-radius:12px;padding:15px;margin-top:15px">
-                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:5px"> Notes client</h6>
+                <h6 style="color:#3E1F0D;font-weight:700;margin-bottom:5px">Notes client</h6>
                 <p style="margin:0;font-size:0.85rem;color:#6B3A2A"><?= htmlspecialchars($detail_order['notes']) ?></p>
             </div>
             <?php endif; ?>
-
         </div>
     </div>
 </div>

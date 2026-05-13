@@ -20,26 +20,22 @@ $sql = "SELECT p.*, c.name as category_name
         WHERE p.active = 1";
 $params = [];
 
-// Filtre par genre (femme / homme / enfant)
 if(!empty($type_filter)) {
     $sql .= " AND (p.genre = ? OR p.genre = 'tous')";
     $params[] = $type_filter;
 }
 
-// Filtre par sous-categorie (soins / meches)
 if($sub_filter === 'soins') {
     $sql .= " AND p.category_id = 5";
 } elseif($sub_filter === 'meches') {
     $sql .= " AND p.category_id IN (1,2,3,4)";
 }
 
-// Filtre par categorie directe
 if($category_filter > 0) {
     $sql .= " AND p.category_id = ?";
     $params[] = $category_filter;
 }
 
-// Filtre par prix
 if($price_filter === '0-20') {
     $sql .= " AND p.price <= 20";
 } elseif($price_filter === '20-40') {
@@ -48,7 +44,6 @@ if($price_filter === '0-20') {
     $sql .= " AND p.price > 40";
 }
 
-// Recherche texte
 if(!empty($search)) {
     $sql .= " AND (p.name LIKE ? OR p.description LIKE ?)";
     $params[] = "%$search%";
@@ -61,17 +56,15 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll();
 
-// Titre dynamique selon les filtres
+// Titre dynamique
 $titre_page = 'Nos Produits';
-if($type_filter === 'femme' && $sub_filter === 'soins')       $titre_page = 'Soins - Femmes';
-elseif($type_filter === 'femme' && $sub_filter === 'meches')  $titre_page = 'Meches - Femmes';
-elseif($type_filter === 'homme' && $sub_filter === 'soins')   $titre_page = 'Soins - Hommes';
-elseif($type_filter === 'homme' && $sub_filter === 'meches')  $titre_page = 'Meches - Hommes';
-elseif($type_filter === 'enfant' && $sub_filter === 'soins')  $titre_page = 'Soins - Enfants';
-elseif($type_filter === 'enfant' && $sub_filter === 'meches') $titre_page = 'Meches - Enfants';
-elseif($type_filter === 'femme')  $titre_page = 'Produits Femmes';
-elseif($type_filter === 'homme')  $titre_page = 'Produits Hommes';
-elseif($type_filter === 'enfant') $titre_page = 'Produits Enfants';
+if($sub_filter === 'soins')        $titre_page = 'Soins Cheveux';
+elseif($sub_filter === 'meches')   $titre_page = 'Nos Meches';
+elseif($category_filter == 1)      $titre_page = 'Meches Bouclees';
+elseif($category_filter == 2)      $titre_page = 'Meches Crepues';
+elseif($category_filter == 3)      $titre_page = 'Meches Lisses';
+elseif($category_filter == 4)      $titre_page = 'Meches Ondulees';
+elseif($category_filter == 5)      $titre_page = 'Soins Cheveux';
 
 include '../includes/header.php';
 ?>
@@ -88,52 +81,24 @@ include '../includes/header.php';
     <!-- FILTRES PAR TYPE DE CHEVEUX -->
     <div class="type-filter-bar mb-4">
         <div class="d-flex gap-2 flex-wrap justify-content-center">
-            <a href="index.php" class="type-filter-btn <?= (!$type_filter && !$sub_filter && !$category_filter) ? 'active' : '' ?>">
-                Tous
-            </a>
-            <a href="index.php?category=1" class="type-filter-btn <?= $category_filter == 1 ? 'active' : '' ?>">
-                Boucles
-            </a>
-            <a href="index.php?category=2" class="type-filter-btn <?= $category_filter == 2 ? 'active' : '' ?>">
-                Crepus
-            </a>
-            <a href="index.php?category=3" class="type-filter-btn <?= $category_filter == 3 ? 'active' : '' ?>">
-                Lisses
-            </a>
-            <a href="index.php?category=4" class="type-filter-btn <?= $category_filter == 4 ? 'active' : '' ?>">
-                Ondules
-            </a>
-            <a href="index.php?category=5" class="type-filter-btn <?= $category_filter == 5 ? 'active' : '' ?>">
-                Soins
-            </a>
-            <a href="index.php?category=6" class="type-filter-btn <?= $category_filter == 6 ? 'active' : '' ?>">
-                Enfants
-            </a>
-            <a href="index.php?category=7" class="type-filter-btn <?= $category_filter == 7 ? 'active' : '' ?>">
-                Hommes
-            </a>
+            <a href="index.php" class="type-filter-btn <?= (!$category_filter && !$sub_filter) ? 'active' : '' ?>">Tous</a>
+            <a href="index.php?category=1" class="type-filter-btn <?= $category_filter == 1 ? 'active' : '' ?>">Boucles</a>
+            <a href="index.php?category=2" class="type-filter-btn <?= $category_filter == 2 ? 'active' : '' ?>">Crepus</a>
+            <a href="index.php?category=3" class="type-filter-btn <?= $category_filter == 3 ? 'active' : '' ?>">Lisses</a>
+            <a href="index.php?category=4" class="type-filter-btn <?= $category_filter == 4 ? 'active' : '' ?>">Ondules</a>
+            <a href="index.php?category=5" class="type-filter-btn <?= $category_filter == 5 ? 'active' : '' ?>">Soins</a>
         </div>
     </div>
 
     <!-- FILTRES AVANCES -->
     <div class="filter-card mb-4">
         <form method="GET" action="" class="row g-3 align-items-end">
-            <!-- Conserver les filtres type et sub -->
-            <?php if($type_filter): ?>
-                <input type="hidden" name="type" value="<?= htmlspecialchars($type_filter) ?>">
-            <?php endif; ?>
-            <?php if($sub_filter): ?>
-                <input type="hidden" name="sub" value="<?= htmlspecialchars($sub_filter) ?>">
-            <?php endif; ?>
-
-            <!-- Recherche -->
             <div class="col-md-5">
                 <label class="filter-label">Rechercher</label>
                 <input type="text" class="form-control filter-input" name="search"
                        placeholder="Meches, shampoing, huile..."
                        value="<?= htmlspecialchars($search) ?>">
             </div>
-            <!-- Categorie -->
             <div class="col-md-3">
                 <label class="filter-label">Categorie</label>
                 <select class="form-select filter-input" name="category">
@@ -145,17 +110,15 @@ include '../includes/header.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-            <!-- Prix -->
             <div class="col-md-2">
                 <label class="filter-label">Prix</label>
                 <select class="form-select filter-input" name="price">
                     <option value="all"     <?= $price_filter === 'all'     ? 'selected' : '' ?>>Tous</option>
-                    <option value="0-20"    <?= $price_filter === '0-20'    ? 'selected' : '' ?>>0 - 20</option>
-                    <option value="20-40"   <?= $price_filter === '20-40'   ? 'selected' : '' ?>>20 - 40</option>
-                    <option value="40-plus" <?= $price_filter === '40-plus' ? 'selected' : '' ?>>40 et +</option>
+                    <option value="0-20"    <?= $price_filter === '0-20'    ? 'selected' : '' ?>>0 - 20€</option>
+                    <option value="20-40"   <?= $price_filter === '20-40'   ? 'selected' : '' ?>>20 - 40€</option>
+                    <option value="40-plus" <?= $price_filter === '40-plus' ? 'selected' : '' ?>>40€ et +</option>
                 </select>
             </div>
-            <!-- Boutons -->
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-gold w-100">Filtrer</button>
                 <a href="index.php" class="btn btn-outline-brown">X</a>
@@ -164,46 +127,44 @@ include '../includes/header.php';
         <div class="mt-2">
             <small class="text-muted">
                 <strong><?= count($products) ?></strong> produit(s) trouve(s)
-                <?php if($type_filter): ?>
-                    dans <strong><?= ucfirst($type_filter) ?>s</strong>
-                <?php endif; ?>
-                <?php if($sub_filter): ?>
-                    - <strong><?= $sub_filter === 'soins' ? 'Soins' : 'Meches' ?></strong>
-                <?php endif; ?>
             </small>
         </div>
     </div>
 
     <!-- GRILLE PRODUITS -->
     <?php if(count($products) > 0): ?>
-        <div class="row g-4">
+        <div class="scroll-horizontal">
             <?php foreach($products as $product): ?>
-                <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="scroll-item">
                     <div class="product-card-hr h-100">
                         <!-- IMAGE -->
-                        <div class="product-img-wrap position-relative">
-                            <img src="<?= !empty($product['image']) ? htmlspecialchars($product['image']) : 'https://via.placeholder.com/400x300?text=HairRoots' ?>"
-                                 alt="<?= htmlspecialchars($product['name']) ?>"
-                                 class="product-img">
-                            <?php if($product['featured']): ?>
-                                <span class="badge-featured">Vedette</span>
-                            <?php endif; ?>
-                            <?php if($product['stock'] <= 10 && $product['stock'] > 0): ?>
-                                <span class="badge-stock-low">Stock limite</span>
-                            <?php endif; ?>
-                            <div class="product-overlay">
-                                <a href="detail.php?id=<?= $product['id'] ?>" class="overlay-btn">Voir</a>
-                            </div>
-                        </div>
-                        <!-- INFOS -->
+                                                        <div class="product-img-wrap position-relative">
+                                    <?php if(!empty($product['image'])): ?>
+                                        <img src="/ecommerce/<?= htmlspecialchars($product['image']) ?>"
+                                            alt="<?= htmlspecialchars($product['name']) ?>"
+                                            class="product-img">
+                                    <?php else: ?>
+                                        <div style="height:220px;background:linear-gradient(135deg,#F5E6D3,#FDEBD0);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if($product['featured']): ?>
+                                        <span class="badge-featured">Vedette</span>
+                                    <?php endif; ?>
+                                    <?php if($product['stock'] <= 10 && $product['stock'] > 0): ?>
+                                        <span class="badge-stock-low">Stock limite</span>
+                                    <?php endif; ?>
+                                  
+                                    <div class="product-overlay">
+                                        <a href="detail.php?id=<?= $product['id'] ?>" class="overlay-btn">Voir</a>
+                                    </div>
+                                </div>
+                                                        <!-- INFOS -->
                         <div class="product-body">
+                                <button class="btn-favori-bottom" style="width:auto" onclick="toggleFavori(this, <?= $product['id'] ?>)">
+                                    <i class="bi bi-heart"></i> Favoris
+                                </button>
                             <?php if($product['category_name']): ?>
                                 <span class="product-category"><?= htmlspecialchars($product['category_name']) ?></span>
-                            <?php endif; ?>
-                            <?php if(!empty($product['genre']) && $product['genre'] !== 'tous'): ?>
-                                <span class="product-category" style="background:#E3F2FD;color:#1565C0;margin-left:4px">
-                                    <?= ucfirst($product['genre']) ?>
-                                </span>
                             <?php endif; ?>
                             <h6 class="product-name"><?= htmlspecialchars($product['name']) ?></h6>
                             <p class="product-desc">
@@ -212,9 +173,7 @@ include '../includes/header.php';
                             <div class="product-footer">
                                 <span class="product-price"><?= number_format($product['price'], 2) ?>€</span>
                                 <?php if($product['stock'] > 0): ?>
-                                    <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">
-                                        Ajouter
-                                    </button>
+                                    <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">Ajouter</button>
                                 <?php else: ?>
                                     <span class="btn-rupture">Rupture</span>
                                 <?php endif; ?>
@@ -236,7 +195,6 @@ include '../includes/header.php';
 
     <?php else: ?>
         <div class="empty-state text-center py-5">
-            <div class="empty-icon"></div>
             <h3>Aucun produit trouve</h3>
             <p class="text-muted">Essayez de modifier vos filtres de recherche</p>
             <a href="index.php" class="btn btn-gold mt-3">Voir tous les produits</a>
@@ -244,5 +202,6 @@ include '../includes/header.php';
     <?php endif; ?>
 
 </div>
-
+<div class="toast-prod" id="toast-prod"></div>
+<script src="/ecommerce/assets/js/script.js"></script>
 <?php include '../includes/footer.php'; ?>
